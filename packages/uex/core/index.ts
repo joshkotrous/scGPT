@@ -120,7 +120,10 @@ export async function queryUEX({
       options.body = typeof body === "string" ? body : JSON.stringify(body);
     }
     if (logResult) console.log("[URL]", url);
-    const resp = await fetch(url, options);
+    const resp = await fetchWithBackoff(url, options);
+    if (endpoint === "data_extract") {
+      return resp;
+    }
     const json = await resp.json();
 
     if (!resp.ok) {
@@ -156,7 +159,13 @@ export async function queryUEX({
       );
       throw new Error("Validation failed.");
     }
-    console.error(`Could not query UEX API: ${endpoint}`);
+    console.error(
+      `Could not query UEX API: \n\n ${endpoint} \n\n ${JSON.stringify(
+        queryParams,
+        null,
+        2
+      )}`
+    );
     throw error;
   }
 }
@@ -171,8 +180,81 @@ export function getValidationObject(validationObject: z.ZodType<any>) {
   return z.object({
     status: z.string(),
     http_code: z.number(),
-    data: z.union([validationObject, z.array(validationObject)]),
-    // data: z.array(validationObject),
-    // data: validationObject,
+    data: z.union([validationObject, z.array(validationObject)]).nullable(),
   });
+}
+
+async function fetchWithBackoff(
+  url: string,
+  options: RequestInit,
+  maxRetries = 10,
+  baseDelay = 2000,
+  maxDelay = 60000
+): Promise<Response> {
+  let retries = 0;
+
+  while (true) {
+    try {
+      const response = await fetch(url, options);
+
+      // Check if response is JSON by trying to clone and examine the first few bytes
+      const clonedResponse = response.clone();
+      const text = await clonedResponse.text();
+
+      // Simple check if it looks like HTML (starts with <!DOCTYPE or <html)
+      const looksLikeHtml =
+        text.trim().startsWith("<!DOCTYPE") || text.trim().startsWith("<html");
+
+      if (looksLikeHtml) {
+        if (retries >= maxRetries) {
+          console.error(
+            `Received HTML response after max retries. First 100 chars: ${text.substring(
+              0,
+              100
+            )}`
+          );
+          return response; // Return the error response after max retries
+        }
+        throw new Error(`Received HTML instead of JSON response`);
+      }
+
+      // Only retry on server errors (5xx)
+      if (response.status >= 500 && response.status < 600) {
+        if (retries >= maxRetries) {
+          return response; // Return the error response after max retries
+        }
+        throw new Error(`Server error: ${response.status}`);
+      }
+
+      // Create a new response with the text content we already read
+      // This is necessary because we've consumed the original response body
+      const newResponse = new Response(text, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers,
+      });
+
+      return newResponse;
+    } catch (error: any) {
+      if (retries >= maxRetries) {
+        console.error(`Fetch failed after ${maxRetries + 1} attempts`);
+        throw error;
+      }
+
+      // Calculate delay with jitter
+      const delay = Math.min(
+        maxDelay,
+        baseDelay * Math.pow(2, retries) * (0.8 + Math.random() * 0.4)
+      );
+
+      console.warn(
+        `Fetch attempt ${retries + 1}/${
+          maxRetries + 1
+        } failed, retrying in ${Math.round(delay)}ms: ${error.message}`
+      );
+
+      retries++;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
 }

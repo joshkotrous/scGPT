@@ -57,7 +57,8 @@ export async function listCategories({
   const result = await queryUEX({
     endpoint,
     queryParams: Object.keys(queryParams).length > 0 ? queryParams : undefined,
-    validationObject: UEXCategoryObject,
+    validationObject: UEXCategoryResponseObject,
+    logResult: true,
   });
 
   return result.data;

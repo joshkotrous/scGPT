@@ -12,11 +12,11 @@ const UEXItemObject = z.object({
   name: z.string(),
   section: z.string(), // coming from categories
   category: z.string(), // coming from categories
-  company_name: z.string(), // coming from companies
-  vehicle_name: z.string(), // coming from vehicles
+  company_name: z.string().nullable(), // coming from companies
+  vehicle_name: z.string().nullable(), // coming from vehicles
   slug: z.string(), // UEX URLs
-  uuid: z.string(), // star citizen uuid
-  url_store: z.string(), // pledge store URL
+  uuid: z.string().nullable(), // star citizen uuid
+  url_store: z.string().nullable(), // pledge store URL
   is_exclusive_pledge: z.number(),
   is_exclusive_subscriber: z.number(),
   is_exclusive_concierge: z.number(),
@@ -42,10 +42,10 @@ const UEXItemAttributeObject = z.object({
   id_category_attribute: z.number(),
   category_name: z.string(),
   item_name: z.string(),
-  item_uuid: z.string(),
+  item_uuid: z.string().nullable(),
   attribute_name: z.string(),
   value: z.string(),
-  unit: z.string(),
+  unit: z.string().nullable(),
   date_added: z.number(), // timestamp, first time added
   date_modified: z.number(), // timestamp, last price update
 });
@@ -66,7 +66,7 @@ const UEXItemPriceObject = z.object({
   id: z.number(),
   id_item: z.number(),
   id_parent: z.number(),
-  id_category: z.number(),
+  id_category: z.number().nullable(),
   id_vehicle: z.number(),
   id_star_system: z.number(),
   id_planet: z.number(),
@@ -79,7 +79,7 @@ const UEXItemPriceObject = z.object({
   id_terminal: z.number(),
 
   // Buy prices
-  price_buy: z.number(), // last reported price
+  price_buy: z.number().nullable(), // last reported price
   price_buy_min: z.number(),
   price_buy_min_week: z.number(),
   price_buy_min_month: z.number(),
@@ -91,7 +91,7 @@ const UEXItemPriceObject = z.object({
   price_buy_avg_month: z.number(),
 
   // Sell prices
-  price_sell: z.number(), // last reported price
+  price_sell: z.number().nullable(), // last reported price
   price_sell_min: z.number(),
   price_sell_min_week: z.number(),
   price_sell_min_month: z.number(),
@@ -121,7 +121,7 @@ const UEXItemPriceObject = z.object({
   game_version: z.string(),
   date_added: z.number(), // timestamp, first time added
   date_modified: z.number(), // timestamp, last price update
-  item_name: z.string(),
+  item_name: z.string().nullable(),
   star_system_name: z.string(),
   planet_name: z.string(),
   orbit_name: z.string(),
@@ -146,13 +146,13 @@ const UEXItemPriceAllObject = z.object({
   id: z.number(),
   id_item: z.number(),
   id_terminal: z.number(),
-  id_category: z.number(),
-  price_buy: z.number(), // last reported price in UEC, per unit
-  price_sell: z.number(), // last reported price in UEC, per unit
+  id_category: z.number().nullable(),
+  price_buy: z.number().nullable(), // last reported price in UEC, per unit
+  price_sell: z.number().nullable(), // last reported price in UEC, per unit
   date_added: z.number(), // timestamp, first time added
   date_modified: z.number(), // timestamp, last price update
-  item_name: z.string(),
-  item_uuid: z.string(), // star citizen uuid
+  item_name: z.string().nullable(),
+  item_uuid: z.string().nullable(), // star citizen uuid
   terminal_name: z.string(),
 });
 

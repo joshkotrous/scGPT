@@ -5,7 +5,7 @@ import { UEXEndpoint } from "../core";
 // 1. Define schema for refineries audits
 const UEXRefineryAuditObject = z.object({
   id: z.number(),
-  id_commodity: z.number(),
+  id_commodity: z.number().nullable().optional(),
   id_star_system: z.number(),
   id_planet: z.number(),
   id_orbit: z.number(),
@@ -13,11 +13,11 @@ const UEXRefineryAuditObject = z.object({
   id_city: z.number(),
   id_outpost: z.number(),
   id_poi: z.number(),
-  id_faction: z.number(),
+  id_faction: z.number().nullable().optional(),
   id_terminal: z.number(),
   yield: z.number(), // percentage of material specialization yield at refinery
   capacity: z.number(), // refinery capacity in percent
-  method: z.number(), // refining method
+  method: z.string(), // refining method
   quantity: z.number(), // amount to be refined
   quantity_yield: z.number(), // amount yield
   quantity_inert: z.number(), // amount of inert materials
@@ -29,12 +29,12 @@ const UEXRefineryAuditObject = z.object({
   datarunner: z.string(), // datarunner ign
   commodity_name: z.string(),
   star_system_name: z.string(),
-  planet_name: z.string(),
+  planet_name: z.string().nullable(),
   orbit_name: z.string(),
-  moon_name: z.string(),
+  moon_name: z.string().nullable(),
   space_station_name: z.string(),
-  city_name: z.string(),
-  outpost_name: z.string(),
+  city_name: z.string().nullable(),
+  outpost_name: z.string().nullable(),
   terminal_name: z.string(),
 });
 
@@ -51,7 +51,7 @@ export type UEXRefineryAuditsResponse = z.infer<
 // 2. Define schema for refineries capacities
 const UEXRefineryCapacityObject = z.object({
   id: z.number(),
-  id_commodity: z.number(),
+  id_commodity: z.number().nullable().optional(),
   id_star_system: z.number(),
   id_planet: z.number(),
   id_orbit: z.number(),
@@ -59,7 +59,7 @@ const UEXRefineryCapacityObject = z.object({
   id_city: z.number(),
   id_outpost: z.number(),
   id_poi: z.number(),
-  id_faction: z.number(),
+  id_faction: z.number().nullable().optional(),
   id_terminal: z.number(),
   value: z.number(), // percentage of yield bonus at refinery
   value_week: z.number(), // percentage of yield bonus at refinery in the last 7 days
@@ -67,12 +67,12 @@ const UEXRefineryCapacityObject = z.object({
   date_added: z.number(), // timestamp
   date_modified: z.number(), // timestamp
   star_system_name: z.string(),
-  planet_name: z.string(),
+  planet_name: z.string().nullable(),
   orbit_name: z.string(),
-  moon_name: z.string(),
+  moon_name: z.string().nullable(),
   space_station_name: z.string(),
-  city_name: z.string(),
-  outpost_name: z.string(),
+  city_name: z.string().nullable(),
+  outpost_name: z.string().nullable(),
   terminal_name: z.string(),
 });
 
@@ -111,7 +111,7 @@ export type UEXRefineryMethodsResponse = z.infer<
 // 4. Define schema for refineries yields
 const UEXRefineryYieldObject = z.object({
   id: z.number(),
-  id_commodity: z.number(),
+  id_commodity: z.number().nullable().optional(),
   id_star_system: z.number(),
   id_planet: z.number(),
   id_orbit: z.number(),
@@ -119,7 +119,7 @@ const UEXRefineryYieldObject = z.object({
   id_city: z.number(),
   id_outpost: z.number(),
   id_poi: z.number(),
-  id_faction: z.number(),
+  id_faction: z.number().nullable().optional(),
   id_terminal: z.number(),
   value: z.number(), // percentage of yield bonus at refinery
   value_week: z.number(), // percentage of yield bonus at refinery (last 7 days)
@@ -128,12 +128,12 @@ const UEXRefineryYieldObject = z.object({
   date_modified: z.number(), // timestamp
   commodity_name: z.string(),
   star_system_name: z.string(),
-  planet_name: z.string(),
+  planet_name: z.string().nullable(),
   orbit_name: z.string(),
-  moon_name: z.string(),
+  moon_name: z.string().nullable(),
   space_station_name: z.string(),
-  city_name: z.string(),
-  outpost_name: z.string(),
+  city_name: z.string().nullable(),
+  outpost_name: z.string().nullable(),
   terminal_name: z.string(),
 });
 
@@ -190,7 +190,6 @@ export async function listRefineryMethods(): Promise<UEXRefineryMethodsResponse>
   const result = await queryUEX({
     endpoint,
     validationObject: UEXRefineryMethodsResponseObject,
-    logResult: true,
   });
 
   return result;

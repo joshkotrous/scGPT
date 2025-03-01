@@ -22,8 +22,8 @@ const UEXMoonObject = z.object({
   star_system_name: z.string(),
   planet_name: z.string(),
   orbit_name: z.string(),
-  faction_name: z.string(),
-  jurisdiction_name: z.string(),
+  faction_name: z.string().nullable(),
+  jurisdiction_name: z.string().nullable(),
 });
 
 export type UEXMoon = z.infer<typeof UEXMoonObject>;

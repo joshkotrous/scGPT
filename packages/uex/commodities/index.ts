@@ -8,7 +8,7 @@ const UEXCommodityObject = z.object({
   name: z.string(),
   code: z.string(),
   kind: z.string(),
-  weight_scu: z.string(),
+  weight_scu: z.number(),
   price_buy: z.number(),
   price_sell: z.number(),
   is_available: z.number(),
@@ -16,7 +16,7 @@ const UEXCommodityObject = z.object({
   is_visible: z.number(),
   is_mineral: z.number(),
   is_raw: z.number(),
-  is_refinded: z.number(),
+  is_refined: z.number(),
   is_harvestable: z.number(),
   is_buyable: z.number(),
   is_sellable: z.number(),
@@ -328,11 +328,11 @@ const UEXCommodityPriceAllObject = z.object({
   date_added: z.number(), // timestamp, first time added
   date_modified: z.number(), // timestamp, last price update
   commodity_name: z.string(),
-  commodity_code: z.string(),
-  commodity_slug: z.string(),
+  commodity_code: z.string().optional(),
+  commodity_slug: z.string().optional(),
   terminal_name: z.string(),
-  terminal_code: z.string(),
-  terminal_slug: z.string(),
+  terminal_code: z.string().optional(),
+  terminal_slug: z.string().optional(),
 });
 
 export type UEXCommodityPriceAll = z.infer<typeof UEXCommodityPriceAllObject>;
@@ -387,7 +387,7 @@ const UEXCommodityPriceHistoryObject = z.object({
   space_station_name: z.string(), // Note: API doc says int(11) but this should be string
   outpost_name: z.string(), // Note: API doc says int(11) but this should be string
   city_name: z.string(), // Note: API doc says int(11) but this should be string
-  faction_name: z.string(), // Note: API doc says int(11) but this should be string
+  faction_name: z.string().nullable(), // Note: API doc says int(11) but this should be string
   terminal_name: z.string(), // Note: API doc says int(11) but this should be string
   terminal_code: z.string(), // Note: API doc says int(11) but this should be string
   terminal_slug: z.string(), // Note: API doc says int(11) but this should be string
@@ -421,14 +421,14 @@ const UEXCommodityRankingObject = z.object({
   slug: z.string(),
   name: z.string(),
   is_temporary: z.number(),
-  price_buy_avg_month: z.number(), // per SCU
-  price_sell_avg_month: z.number(), // per SCU
-  scu_buy_avg_month: z.number(),
-  scu_sell_avg_month: z.number(),
-  status_buy_avg_month: z.number(), // inventory level
-  status_sell_avg_month: z.number(), // inventory level
-  volatility_buy: z.number(), // price coefficient of variation. higher is worse
-  volatility_sell: z.number(), // price coefficient of variation. higher is worse
+  price_buy_avg_month: z.number().optional(), // per SCU
+  price_sell_avg_month: z.number().optional(), // per SCU
+  scu_buy_avg_month: z.number().optional(),
+  scu_sell_avg_month: z.number().optional(),
+  status_buy_avg_month: z.number().optional(), // inventory level
+  status_sell_avg_month: z.number().optional(), // inventory level
+  volatility_buy: z.number().optional(), // price coefficient of variation. higher is worse
+  volatility_sell: z.number().optional(), // price coefficient of variation. higher is worse
   cax_score: z.number(), // commodity score, higher is better
   investment: z.number(),
   investment_per_scu: z.number(),
@@ -437,12 +437,12 @@ const UEXCommodityRankingObject = z.object({
   profitability_per_scu: z.number(),
   availability_buy: z.number(), // number of locations buying
   availability_sell: z.number(), // number of locations selling
-  price_buy_minimum: z.number(), // lowest purchase price found
-  price_sell_maximum: z.number(), // highest sell price found
-  terminal_id_price_buy_minimum: z.number(), // terminal ID with the lowest purchase price found
-  terminal_slug_price_buy_minimum: z.string(), // terminal slug with the lowest purchase price found
-  terminal_id_price_sell_maximum: z.number(), // terminal ID with the highest sell price found
-  terminal_slug_price_sell_maximum: z.string(), // terminal slug with the highest sell price found
+  price_buy_minimum: z.number().nullable().optional(), // lowest purchase price found
+  price_sell_maximum: z.number().nullable(), // highest sell price found
+  terminal_id_price_buy_minimum: z.number().nullable().optional(), // terminal ID with the lowest purchase price found
+  terminal_slug_price_buy_minimum: z.string().nullable().optional(), // terminal slug with the lowest purchase price found
+  terminal_id_price_sell_maximum: z.number().nullable(), // terminal ID with the highest sell price found
+  terminal_slug_price_sell_maximum: z.string().nullable(), // terminal slug with the highest sell price found
 });
 
 export type UEXCommodityRanking = z.infer<typeof UEXCommodityRankingObject>;
@@ -491,8 +491,8 @@ const UEXCommodityRawPriceObject = z.object({
   date_added: z.number(), // timestamp, first time added
   date_modified: z.number(), // timestamp, last price update
   commodity_name: z.string(),
-  commodity_code: z.string(),
-  commodity_slug: z.string(),
+  commodity_code: z.string().optional(),
+  commodity_slug: z.string().optional(),
   star_system_name: z.string(),
   planet_name: z.string(),
   orbit_name: z.string(),
@@ -500,10 +500,10 @@ const UEXCommodityRawPriceObject = z.object({
   space_station_name: z.string(),
   outpost_name: z.string(),
   city_name: z.string(),
-  faction_name: z.string(),
+  faction_name: z.string().nullable(),
   terminal_name: z.string(), // Note: API doc says int(11) but this should be string
-  terminal_code: z.string(), // Note: API doc says int(11) but this should be string
-  terminal_slug: z.string(), // Note: API doc says int(11) but this should be string
+  terminal_code: z.string().optional(), // Note: API doc says int(11) but this should be string
+  terminal_slug: z.string().optional(), // Note: API doc says int(11) but this should be string
   terminal_is_player_owned: z.number(),
 });
 
@@ -516,6 +516,9 @@ const UEXListCommodityRawPricesResponseObject = getValidationObject(
 export type UEXListCommodityRawPricesResponse = z.infer<
   typeof UEXListCommodityRawPricesResponseObject
 >;
+export type UEXListCommodityRawPricesList = z.infer<
+  typeof UEXCommodityRawPriceObject
+>[];
 
 export type CommodityRawPricesFilter = {
   id_terminal?: number | string; // Supports comma-separated list of up to 10 ids
@@ -531,11 +534,11 @@ const UEXCommodityRawPriceAllObject = z.object({
   date_added: z.number(), // timestamp, first time added
   date_modified: z.number(), // timestamp, last price update
   commodity_name: z.string(),
-  commodity_code: z.string(),
-  commodity_slug: z.string(),
+  commodity_code: z.string().optional(),
+  commodity_slug: z.string().optional(),
   terminal_name: z.string(), // Note: API doc says int(11) but this should be string
-  terminal_code: z.string(), // Note: API doc says int(11) but this should be string
-  terminal_slug: z.string(), // Note: API doc says int(11) but this should be string
+  terminal_code: z.string().optional(), // Note: API doc says int(11) but this should be string
+  terminal_slug: z.string().optional(), // Note: API doc says int(11) but this should be string
 });
 
 export type UEXCommodityRawPriceAll = z.infer<
@@ -667,7 +670,7 @@ export async function listCommoditiesRawPrices({
   filter,
 }: {
   filter: CommodityRawPricesFilter;
-}): Promise<UEXListCommodityRawPricesResponse> {
+}): Promise<UEXListCommodityRawPricesList> {
   const endpoint: UEXEndpoint = "commodities_raw_prices";
 
   if (!filter.id_terminal && !filter.id_commodity) {
@@ -682,7 +685,7 @@ export async function listCommoditiesRawPrices({
     validationObject: UEXListCommodityRawPricesResponseObject,
   });
 
-  return result;
+  return result.data;
 }
 
 export async function listAllCommoditiesRawPrices(): Promise<UEXCommodityRawPricesAllResponse> {

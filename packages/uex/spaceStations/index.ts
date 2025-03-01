@@ -37,15 +37,15 @@ const UEXSpaceStationObject = z.object({
   has_loading_dock: z.number(),
   has_docking_port: z.number(),
   has_freight_elevator: z.number(),
-  pad_types: z.string(), // XS, S, M, L, XL
+  pad_types: z.string().nullable(), // XS, S, M, L, XL
   date_added: z.number(), // timestamp
   date_modified: z.number(), // timestamp
   star_system_name: z.string(),
-  planet_name: z.string(),
+  planet_name: z.string().nullable(),
   orbit_name: z.string(),
-  city_name: z.string(),
-  faction_name: z.string(),
-  jurisdiction_name: z.string(),
+  city_name: z.string().nullable(),
+  faction_name: z.string().nullable(),
+  jurisdiction_name: z.string().nullable(),
 });
 
 export type UEXSpaceStation = z.infer<typeof UEXSpaceStationObject>;

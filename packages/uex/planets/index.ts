@@ -55,7 +55,6 @@ export async function listPlanets({
     endpoint,
     queryParams: filter,
     validationObject: UEXPlanetsResponseObject,
-    logResult: true,
   });
 
   return result.data;

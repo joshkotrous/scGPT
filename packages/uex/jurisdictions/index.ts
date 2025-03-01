@@ -15,7 +15,7 @@ const UEXJurisdictionObject = z.object({
   wiki: z.string(), // wiki page
   date_added: z.number(), // timestamp
   date_modified: z.number(), // timestamp
-  faction_name: z.string(),
+  faction_name: z.string().nullable(),
 });
 
 export type UEXJurisdiction = z.infer<typeof UEXJurisdictionObject>;

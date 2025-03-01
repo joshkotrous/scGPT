@@ -66,11 +66,11 @@ const UEXFuelPriceAllObject = z.object({
   date_added: z.number(), // timestamp, first time added
   date_modified: z.number(), // timestamp, last price update
   commodity_name: z.string(),
-  commodity_code: z.string(),
-  commodity_slug: z.string(),
+  commodity_code: z.string().optional(),
+  commodity_slug: z.string().optional(),
   terminal_name: z.string(),
-  terminal_code: z.string(),
-  terminal_slug: z.string(),
+  terminal_code: z.string().optional(),
+  terminal_slug: z.string().optional(),
 });
 
 export type UEXFuelPriceAll = z.infer<typeof UEXFuelPriceAllObject>;

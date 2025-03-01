@@ -13,7 +13,7 @@ import { UEXPlanet } from "../../../uex/planets";
 import { UEXRefineryMethodsResponse } from "../../../uex/refineries";
 import { UEXStarSystem, UEXStarSystemsList } from "../../../uex/starSystems";
 import { UEXTerminalDistance, UEXTerminalsList } from "../../../uex/terminals";
-import { UEXVehicleLoanersResponse } from "../../../uex/vehicles";
+import { UEXVehicleLoanersList } from "../../../uex/vehicles";
 
 export async function getCoreReferenceData(): Promise<{
   gameVersions: UEXGameVersions;
@@ -74,10 +74,9 @@ export async function getLocationHierarchyData(
     orbitDistances?: any;
   }
 
-  const locationsBySystem: Record<number, LocationSystemData> = {};
-
-  for (const system of starSystems) {
-    locationsBySystem[system.id] = {
+  // Process each star system in parallel
+  const systemPromises = starSystems.map(async (system) => {
+    const locationData: LocationSystemData = {
       system,
       planets: [],
       orbits: [],
@@ -87,10 +86,18 @@ export async function getLocationHierarchyData(
       cities: [],
     };
 
-    // Get planets in this system
-    const planets = await uex.planets.listPlanets({
-      filter: { id_star_system: system.id },
-    });
+    // Get planets, orbits, and space stations in parallel
+    const [planets, orbits, spaceStations] = await Promise.all([
+      uex.planets.listPlanets({
+        filter: { id_star_system: system.id },
+      }),
+      uex.orbits.listOrbits({
+        filter: { id_star_system: system.id },
+      }),
+      uex.spaceStations.listSpaceStations({
+        filter: { id_star_system: system.id },
+      }),
+    ]);
 
     // Create enhanced planets with additional properties
     const enhancedPlanets: EnhancedPlanet[] = planets.map((planet) => ({
@@ -100,54 +107,60 @@ export async function getLocationHierarchyData(
       pois: [],
     }));
 
-    locationsBySystem[system.id].planets = enhancedPlanets;
+    locationData.planets = enhancedPlanets;
+    locationData.orbits = orbits;
+    locationData.spaceStations = spaceStations;
 
-    // Get orbits in this system
-    const orbits = await uex.orbits.listOrbits({
-      filter: { id_star_system: system.id },
-    });
-    locationsBySystem[system.id].orbits = orbits;
+    // For each planet, get its moons, outposts, and POIs in parallel
+    const planetDataPromises = enhancedPlanets.map(async (planet) => {
+      // Get all three types of data for each planet in parallel
+      const [moons, planetOutposts, planetPOIs] = await Promise.all([
+        uex.moons.listMoons({
+          filter: { id_planet: planet.id },
+        }),
+        uex.outposts.listOutposts({
+          filter: { id_planet: planet.id },
+        }),
+        uex.poi.listPointsOfInterest({
+          filter: { id_planet: planet.id },
+        }),
+      ]);
 
-    // Get space stations in this system
-    const spaceStations = await uex.spaceStations.listSpaceStations({
-      filter: { id_star_system: system.id },
-    });
-    locationsBySystem[system.id].spaceStations = spaceStations;
-
-    // For each planet, get its moons, outposts, and POIs
-    for (const planet of enhancedPlanets) {
-      const moons = await uex.moons.listMoons({
-        filter: { id_planet: planet.id },
-      });
+      // Assign the results to the planet
       planet.moons = moons;
-
-      // Get outposts on this planet
-      const planetOutposts = await uex.outposts.listOutposts({
-        filter: { id_planet: planet.id },
-      });
       planet.outposts = planetOutposts;
-
-      // Get POIs on this planet
-      const planetPOIs = await uex.poi.listPointsOfInterest({
-        filter: { id_planet: planet.id },
-      });
       planet.pois = planetPOIs;
-    }
+
+      return planet;
+    });
+
+    // Wait for all planet data to be populated
+    await Promise.all(planetDataPromises);
 
     // Get orbital distances within the system
     try {
-      const orbitDistances = await uex.orbits.listOrbitDistances({
+      locationData.orbitDistances = await uex.orbits.listOrbitDistances({
         filter: {
           id_star_system_origin: system.id,
           id_star_system_destination: system.id,
         },
       });
-      locationsBySystem[system.id].orbitDistances = orbitDistances;
     } catch (error: any) {
       console.warn(
         `Couldn't get orbit distances for system ${system.id}: ${error.message}`
       );
     }
+
+    return { systemId: system.id, locationData };
+  });
+
+  // Wait for all star systems to be processed
+  const results = await Promise.all(systemPromises);
+
+  // Convert array of results back to the expected object structure
+  const locationsBySystem: Record<number, LocationSystemData> = {};
+  for (const { systemId, locationData } of results) {
+    locationsBySystem[systemId] = locationData;
   }
 
   return locationsBySystem;
@@ -160,11 +173,17 @@ export async function getTradingTerminalData(starSystems: UEXStarSystemsList) {
     const systemTerminals = await uex.terminals.listTerminals({
       filter: { id_star_system: system.id },
     });
-    allTerminals.push(...systemTerminals);
+    if (systemTerminals) {
+      allTerminals.push(...systemTerminals);
+    }
   }
 
   // Get terminal distances for important routes
   const terminalDistances: UEXTerminalDistance[] = [];
+  console.log(
+    "Terminals with default system === 0 ",
+    allTerminals.filter((t) => t.is_default_system !== 1).length
+  );
   const majorTerminals = allTerminals.filter((t) => t.is_default_system === 1);
   for (const origin of majorTerminals) {
     for (const destination of majorTerminals) {
@@ -260,7 +279,7 @@ export async function getVehicleData() {
   const vehiclePledgePrices = await uex.vehicles.listVehiclePrices();
 
   // Get vehicle loaners for concept ships
-  const vehicleLoaners: UEXVehicleLoanersResponse[] = [];
+  const vehicleLoaners: UEXVehicleLoanersList[] = [];
   for (const vehicle of vehicles.filter((v) => v.is_concept === 1)) {
     try {
       const loaners = await uex.vehicles.getVehicleLoaners({
@@ -285,7 +304,7 @@ export async function getItemsData() {
   // First get categories
   const categories = await uex.categories.listCategories();
   const items: UEXItemsList = [];
-
+  console.log(`Getting ${categories.length} categories...`);
   for (const category of categories) {
     try {
       const categoryItems = await uex.items.listItems({
@@ -293,7 +312,9 @@ export async function getItemsData() {
       });
       items.push(...categoryItems);
     } catch (error) {
-      console.warn(`Couldn't get items for category ${category.id}`);
+      console.warn(
+        `Couldn't get items for category ${category.id}:${category.name}`
+      );
     }
   }
 
@@ -301,23 +322,63 @@ export async function getItemsData() {
   const allItemPrices = await uex.items.listAllItemPrices();
 
   // Get item attributes for each item
-  const itemAttributes: UEXItemAttributesList = [];
-  for (const item of items) {
-    try {
-      const attributes = await uex.items.listItemAttributes({
-        filter: { id_item: item.id },
-      });
-      itemAttributes.push(...attributes);
-    } catch (error) {
-      console.warn(`Couldn't get attributes for item ${item.id}`);
-    }
-  }
+  // const itemAttributes: UEXItemAttributesList = [];
+  console.log(`Getting ${items.length} items...`);
+
+  const itemAttributes = await processBatchedAttributes(items, 50);
+
   return {
     categories,
     items,
     allItemPrices,
     itemAttributes,
   };
+}
+async function processBatchedAttributes(items: UEXItemsList, batchSize = 50) {
+  const allAttributes = [];
+
+  // Calculate how many batches we'll need
+  const batchCount = Math.ceil(items.length / batchSize);
+
+  for (let i = 0; i < batchCount; i++) {
+    // Get the current batch of items
+    const batchStart = i * batchSize;
+    const batchItems = items.slice(batchStart, batchStart + batchSize);
+
+    console.log(
+      `Processing batch ${i + 1}/${batchCount} (${batchItems.length} items)`
+    );
+
+    // Create promises for this batch
+    const batchPromises = batchItems.map((item) => {
+      return new Promise(async (resolve) => {
+        try {
+          const attributes = await uex.items.listItemAttributes({
+            filter: { id_item: item.id },
+          });
+          resolve(attributes);
+        } catch (error) {
+          console.warn(
+            `Couldn't get attributes for item ${item.id}:${item.name}`
+          );
+          resolve([]); // Return empty array on error instead of rejecting
+        }
+      });
+    });
+
+    // Wait for current batch to complete
+    const batchResults = await Promise.all(batchPromises);
+
+    // Add this batch's results to our collection
+    allAttributes.push(...batchResults.flat());
+
+    // Optional: Add a small delay between batches to be gentle on the API
+    if (i < batchCount - 1) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+  }
+
+  return allAttributes;
 }
 
 export async function getRefineryData() {
@@ -340,6 +401,10 @@ export async function getDataExtracts() {
   ]);
 }
 
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 /**
  * Extract all UEX data for embedding into Pinecone
  * @returns A structured object containing all UEX data
@@ -347,21 +412,21 @@ export async function getDataExtracts() {
 export async function extractUEXData() {
   console.log("Starting UEX data extraction process...");
 
-  // Step 1: Get core reference data
-  console.log("Extracting core reference data...");
-  const coreData = await getCoreReferenceData();
-  console.log(
-    `Retrieved core data: ${coreData.starSystems.length} star systems, ${coreData.factions.length} factions, etc.`
-  );
+  // // Step 1: Get core reference data
+  // console.log("Extracting core reference data...");
+  // const coreData = await getCoreReferenceData();
+  // console.log(
+  //   `Retrieved core data: ${coreData.starSystems.length} star systems, ${coreData.factions.length} factions, etc.`
+  // );
 
-  // // Step 2: Get location hierarchy data
-  console.log("Extracting location hierarchy data...");
-  const locationData = await getLocationHierarchyData(coreData.starSystems);
-  console.log(
-    `Retrieved location data for ${
-      Object.keys(locationData).length
-    } star systems`
-  );
+  // // // Step 2: Get location hierarchy data
+  // console.log("Extracting location hierarchy data...");
+  // const locationData = await getLocationHierarchyData(coreData.starSystems);
+  // console.log(
+  //   `Retrieved location data for ${
+  //     Object.keys(locationData).length
+  //   } star systems`
+  // );
 
   // // Step 3: Get trading terminal data
   // console.log("Extracting trading terminal data...");
@@ -398,15 +463,15 @@ export async function extractUEXData() {
   //   `Retrieved ${itemsData.items.length} items across ${itemsData.categories.length} categories`
   // );
 
-  // // Step 8: Get refinery data
-  // console.log("Extracting refinery data...");
-  // const refineryData = await getRefineryData();
-  // console.log(`Retrieved refinery data`);
+  // Step 8: Get refinery data
+  console.log("Extracting refinery data...");
+  const refineryData = await getRefineryData();
+  console.log(`Retrieved refinery data`);
 
-  // // Step 9: Get data extracts
-  // console.log("Extracting special data extracts...");
-  // const dataExtracts = await getDataExtracts();
-  // console.log(`Retrieved special data extracts`);
+  // Step 9: Get data extracts
+  console.log("Extracting special data extracts...");
+  const dataExtracts = await getDataExtracts();
+  console.log(`Retrieved special data extracts`);
 
   // // Step 10: Assemble the complete dataset
   // const completeData = {

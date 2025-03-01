@@ -44,14 +44,14 @@ const UEXTerminalObject = z.object({
   date_added: z.number(), // timestamp
   date_modified: z.number(), // timestamp
   star_system_name: z.string(),
-  planet_name: z.string(),
-  orbit_name: z.string(),
-  moon_name: z.string(),
-  space_station_name: z.string(),
-  outpost_name: z.string(),
-  city_name: z.string(),
-  faction_name: z.string(),
-  company_name: z.string(),
+  planet_name: z.string().nullable(),
+  orbit_name: z.string().nullable(),
+  moon_name: z.string().nullable(),
+  space_station_name: z.string().nullable(),
+  outpost_name: z.string().nullable(),
+  city_name: z.string().nullable(),
+  faction_name: z.string().nullable(),
+  company_name: z.string().nullable(),
   max_container_size: z.number(), // max container size in SCU
 });
 

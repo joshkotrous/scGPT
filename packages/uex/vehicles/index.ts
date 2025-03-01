@@ -7,20 +7,20 @@ const UEXVehicleObject = z.object({
   id: z.number(),
   id_company: z.number(), // vehicle manufacturer
   id_parent: z.number(), // parent ship series
-  ids_vehicles_loaners: z.string(), // vehicles loaned, comma separated
+  ids_vehicles_loaners: z.string().nullable(), // vehicles loaned, comma separated
   name: z.string(),
   name_full: z.string(),
   slug: z.string(),
-  uuid: z.string(), // star citizen uuid
+  uuid: z.string().nullable(), // star citizen uuid
   scu: z.number(),
-  crew: z.string(), // comma separated
+  crew: z.string().nullable(), // comma separated
   mass: z.number(),
   width: z.number(),
   height: z.number(),
   length: z.number(),
   fuel_quantum: z.number(), // SCU
   fuel_hydrogen: z.number(), // SCU
-  container_sizes: z.string(), // SCU, comma separated
+  container_sizes: z.string().nullable(), // SCU, comma separated
   is_addon: z.number(), // e.g. RSI Galaxy Refinery Module
   is_boarding: z.number(),
   is_bomber: z.number(),
@@ -57,12 +57,12 @@ const UEXVehicleObject = z.object({
   is_stealth: z.number(),
   is_tractor_beam: z.number(),
   is_quantum_capable: z.number(),
-  url_store: z.string(),
-  url_brochure: z.string(),
-  url_hotsite: z.string(),
-  url_video: z.string(),
+  url_store: z.string().nullable(),
+  url_brochure: z.string().nullable(),
+  url_hotsite: z.string().nullable(),
+  url_video: z.string().nullable(),
   // url_photos field removed as noted in documentation (deprecated)
-  pad_type: z.string(), // XS, S, M, L, XL
+  pad_type: z.string().nullable(), // XS, S, M, L, XL
   game_version: z.string(), // version it was announced or updated
   date_added: z.number(), // timestamp
   date_modified: z.number(), // timestamp
@@ -82,7 +82,7 @@ const UEXLoanerVehicleObject = z.object({
   id: z.number(),
   id_company: z.number(),
   id_parent: z.number(),
-  ids_vehicles_loaners: z.string(),
+  ids_vehicles_loaners: z.string().nullable(),
   name: z.string(),
   name_full: z.string(),
   scu: z.number(),
@@ -117,9 +117,9 @@ const UEXLoanerVehicleObject = z.object({
   is_spaceship: z.number(),
   is_showdown_winner: z.number(),
   url_store: z.string(),
-  url_brochure: z.string(),
-  url_hotsite: z.string(),
-  url_video: z.string(),
+  url_brochure: z.string().nullable(),
+  url_hotsite: z.string().nullable(),
+  url_video: z.string().nullable(),
   url_photos: z.any().optional(),
   game_version: z.string(),
   date_added: z.number(),
@@ -132,10 +132,10 @@ const UEXVehicleLoanersObject = z.object({
   id: z.number(),
   id_company: z.number(),
   id_parent: z.number(),
-  ids_vehicles_loaners: z.string(),
+  ids_vehicles_loaners: z.string().nullable(),
   name: z.string(),
   name_full: z.string(),
-  uuid: z.string(),
+  uuid: z.string().nullable(),
   scu: z.number(),
   crew: z.string(),
   is_addon: z.number(),
@@ -168,9 +168,9 @@ const UEXVehicleLoanersObject = z.object({
   is_spaceship: z.number(),
   is_showdown_winner: z.number(),
   url_store: z.string(),
-  url_brochure: z.string(),
-  url_hotsite: z.string(),
-  url_video: z.string(),
+  url_brochure: z.string().nullable(),
+  url_hotsite: z.string().nullable(),
+  url_video: z.string().nullable().optional(),
   url_photos: z.any().optional(),
   game_version: z.string(),
   date_added: z.number(),
@@ -179,9 +179,15 @@ const UEXVehicleLoanersObject = z.object({
   loaners: z.array(UEXLoanerVehicleObject),
 });
 
-export type UEXVehicleLoaners = z.infer<typeof UEXVehicleLoanersObject>;
+export const UEXVehicleLoanersResponseObject = getValidationObject(
+  UEXLoanerVehicleObject
+);
 
-export type UEXVehicleLoanersResponse = UEXVehicleLoaners;
+export type UEXVehicleLoanersResponse = z.infer<
+  typeof UEXVehicleLoanersResponseObject
+>;
+UEXVehicleLoanersResponseObject;
+export type UEXVehicleLoanersList = z.infer<typeof UEXVehicleLoanersObject>[];
 
 // 3. Define schema for /vehicles_prices endpoint
 const UEXVehiclePriceObject = z.object({
@@ -435,7 +441,7 @@ export async function getVehicleLoaners({
   filter,
 }: {
   filter: VehicleLoanersFilter;
-}): Promise<UEXVehicleLoanersResponse> {
+}): Promise<UEXVehicleLoanersList> {
   const endpoint: UEXEndpoint = "vehicles_loaners";
 
   if (!filter.id_vehicle && !filter.uuid && !filter.name) {
@@ -447,7 +453,7 @@ export async function getVehicleLoaners({
   const result = await queryUEX({
     endpoint,
     queryParams: filter,
-    validationObject: UEXVehicleLoanersObject,
+    validationObject: UEXVehicleLoanersResponseObject,
   });
 
   return result.data;
