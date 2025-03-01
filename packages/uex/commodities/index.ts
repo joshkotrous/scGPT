@@ -551,12 +551,16 @@ export type UEXCommodityRawPricesAllResponse = z.infer<
 >;
 
 const UEXCommodityStatusObject = z.object({
-  code: z.string(), // status code
-  name: z.string(), // state name
-  name_short: z.string(), // state short name
-  name_abbr: z.string(), // state name abbreviation
-  percentage: z.string(), // expected SCU availability
-  colors: z.string(), // color grade
+  buy: z.array(
+    z.object({
+      code: z.number(),
+      name: z.string(),
+      name_short: z.string(),
+      name_abbr: z.string(),
+      percentage: z.string(),
+      colors: z.string(),
+    })
+  ),
 });
 
 export type UEXCommodityStatus = z.infer<typeof UEXCommodityStatusObject>;

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z, ZodError } from "zod";
 
 const UEX_API_URL = "https://api.uexcorp.space/2.0/";
 
@@ -119,7 +119,7 @@ export async function queryUEX({
     if (body && method !== "GET") {
       options.body = typeof body === "string" ? body : JSON.stringify(body);
     }
-
+    if (logResult) console.log("[URL]", url);
     const resp = await fetch(url, options);
     const json = await resp.json();
 
@@ -130,25 +130,49 @@ export async function queryUEX({
         }\n${JSON.stringify(json, null, 2)}`
       );
     }
+
     if (logResult) {
-      console.log(`[RESULT] ${endpoint} \n\n`, JSON.stringify(json, null, 2));
+      console.log(
+        `[RESULT] ${endpoint} \n\n`,
+        JSON.stringify(json, null, 2).slice(0, 1000)
+      );
     }
 
-    return validationObject.parse(json);
+    const result = validationObject.safeParse(json);
+    if (!result.success) {
+      console.error(
+        `Validation failed for ${endpoint}:`,
+        JSON.stringify(result.error.errors.slice(0, 5), null, 2)
+      );
+      throw new Error("Validation failed. See logs for details.");
+    }
+
+    return result.data;
   } catch (error) {
-    console.error(
-      `Could not query UEX API: ${
-        error instanceof Error ? error.message : String(error)
-      }`
-    );
+    if (error instanceof ZodError) {
+      console.error(
+        `Validation error in UEX API response (${endpoint}):`,
+        formatZodErrors(error)
+      );
+      throw new Error("Validation failed.");
+    }
+    console.error(`Could not query UEX API: ${endpoint}`);
     throw error;
   }
+}
+
+function formatZodErrors(error: ZodError) {
+  return error.errors
+    .map((e) => `${e.path.join(".")}: ${e.message}`)
+    .join("\n");
 }
 
 export function getValidationObject(validationObject: z.ZodType<any>) {
   return z.object({
     status: z.string(),
     http_code: z.number(),
-    data: z.union([z.array(validationObject), validationObject]),
+    data: z.union([validationObject, z.array(validationObject)]),
+    // data: z.array(validationObject),
+    // data: validationObject,
   });
 }

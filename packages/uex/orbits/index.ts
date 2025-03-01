@@ -23,8 +23,8 @@ const UEXOrbitObject = z.object({
   date_added: z.number(), // timestamp
   date_modified: z.number(), // timestamp
   star_system_name: z.string(),
-  faction_name: z.string(),
-  jurisdiction_name: z.string(),
+  faction_name: z.string().nullable(),
+  jurisdiction_name: z.string().nullable(),
 });
 
 export type UEXOrbit = z.infer<typeof UEXOrbitObject>;

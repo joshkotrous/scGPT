@@ -4,11 +4,11 @@ import { UEXEndpoint } from "../core";
 
 const UEXCompanyObject = z.object({
   id: z.number(),
-  id_faction: z.number(),
+  id_faction: z.number().optional(),
   name: z.string(),
   nickname: z.string(),
-  wiki: z.string(),
-  industry: z.string(), // main activity
+  wiki: z.string().nullable(),
+  industry: z.string().nullable(), // main activity
   is_item_manufacturer: z.number(),
   is_vehicle_manufacturer: z.number(),
   date_added: z.number(), // timestamp

@@ -95,7 +95,7 @@ const UEXRefineryMethodObject = z.object({
   rating_cost: z.number(), // '1' to low, '2' to medium, '3' to high
   rating_speed: z.number(), // '1' to slow, '2' to medium, '3' to fast
   date_added: z.number(), // timestamp
-  date_modified: z.number(), // timestamp
+  date_modified: z.number().optional(), // timestamp
 });
 
 export type UEXRefineryMethod = z.infer<typeof UEXRefineryMethodObject>;
@@ -190,6 +190,7 @@ export async function listRefineryMethods(): Promise<UEXRefineryMethodsResponse>
   const result = await queryUEX({
     endpoint,
     validationObject: UEXRefineryMethodsResponseObject,
+    logResult: true,
   });
 
   return result;

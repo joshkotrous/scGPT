@@ -15,12 +15,12 @@ const UEXPlanetObject = z.object({
   is_available_live: z.number(), // Star Citizen (LIVE servers)
   is_visible: z.number(), // UEX website (visible to everyone)
   is_default: z.number(),
-  is_lagrange: z.number(),
+  is_lagrange: z.number().optional(),
   date_added: z.number(), // timestamp
   date_modified: z.number(), // timestamp
   star_system_name: z.string(),
-  faction_name: z.string(),
-  jurisdiction_name: z.string(),
+  faction_name: z.string().nullable(),
+  jurisdiction_name: z.string().nullable(),
 });
 
 export type UEXPlanet = z.infer<typeof UEXPlanetObject>;
@@ -55,6 +55,7 @@ export async function listPlanets({
     endpoint,
     queryParams: filter,
     validationObject: UEXPlanetsResponseObject,
+    logResult: true,
   });
 
   return result.data;

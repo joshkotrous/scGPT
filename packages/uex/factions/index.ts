@@ -6,8 +6,8 @@ import { UEXEndpoint } from "../core";
 const UEXFactionObject = z.object({
   id: z.number(),
   ids_star_systems: z.string(), // comma separated
-  ids_factions_friendly: z.string(), // comma separated
-  ids_factions_hostile: z.string(), // comma separated
+  ids_factions_friendly: z.string().nullable(), // comma separated
+  ids_factions_hostile: z.string().nullable(), // comma separated
   name: z.string(),
   wiki: z.string(), // wiki page
   is_piracy: z.number(), // is related to piracy

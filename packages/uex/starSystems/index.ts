@@ -16,8 +16,8 @@ const UEXStarSystemObject = z.object({
   wiki: z.string(), // Wiki URL
   date_added: z.number(), // timestamp
   date_modified: z.number(), // timestamp
-  faction_name: z.string(),
-  jurisdiction_name: z.string(),
+  faction_name: z.string().nullable(),
+  jurisdiction_name: z.string().nullable(),
 });
 
 export type UEXStarSystem = z.infer<typeof UEXStarSystemObject>;
