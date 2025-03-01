@@ -10,6 +10,10 @@ const UEXGameVersionsObject = z.object({
 
 export type UEXGameVersions = z.infer<typeof UEXGameVersionsObject>;
 
+const UEXGameVersionsResponseObject = getValidationObject(
+  UEXGameVersionsObject
+);
+
 /**
  * Get current game versions information from the UEX API
  * Retrieves information about current live and PTU versions of Star Citizen
@@ -20,7 +24,7 @@ export async function listGameVersions(): Promise<UEXGameVersions> {
 
   const result = await queryUEX({
     endpoint,
-    validationObject: UEXGameVersionsObject,
+    validationObject: UEXGameVersionsResponseObject,
   });
 
   return result.data;

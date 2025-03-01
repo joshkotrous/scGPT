@@ -77,12 +77,14 @@ export async function queryUEX({
   body,
   validationObject,
   method = "GET",
+  logResult = false,
 }: {
   endpoint: UEXEndpoint;
   queryParams?: Record<string, string | number | undefined>;
   body?: any;
   validationObject: z.ZodType<any>;
   method?: "GET" | "POST" | "PUT" | "DELETE";
+  logResult?: boolean;
 }) {
   try {
     let url = `${UEX_API_URL}${endpoint}`;
@@ -128,6 +130,10 @@ export async function queryUEX({
         }\n${JSON.stringify(json, null, 2)}`
       );
     }
+    if (logResult) {
+      console.log(`[RESULT] ${endpoint} \n\n`, JSON.stringify(json, null, 2));
+    }
+
     return validationObject.parse(json);
   } catch (error) {
     console.error(
@@ -143,6 +149,6 @@ export function getValidationObject(validationObject: z.ZodType<any>) {
   return z.object({
     status: z.string(),
     http_code: z.number(),
-    data: z.array(validationObject),
+    data: z.union([z.array(validationObject), validationObject]),
   });
 }
