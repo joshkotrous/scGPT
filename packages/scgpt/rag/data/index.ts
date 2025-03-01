@@ -412,56 +412,56 @@ function delay(ms: number): Promise<void> {
 export async function extractUEXData() {
   console.log("Starting UEX data extraction process...");
 
-  // // Step 1: Get core reference data
-  // console.log("Extracting core reference data...");
-  // const coreData = await getCoreReferenceData();
-  // console.log(
-  //   `Retrieved core data: ${coreData.starSystems.length} star systems, ${coreData.factions.length} factions, etc.`
-  // );
+  // Step 1: Get core reference data
+  console.log("Extracting core reference data...");
+  const coreData = await getCoreReferenceData();
+  console.log(
+    `Retrieved core data: ${coreData.starSystems.length} star systems, ${coreData.factions.length} factions, etc.`
+  );
 
-  // // // Step 2: Get location hierarchy data
-  // console.log("Extracting location hierarchy data...");
-  // const locationData = await getLocationHierarchyData(coreData.starSystems);
-  // console.log(
-  //   `Retrieved location data for ${
-  //     Object.keys(locationData).length
-  //   } star systems`
-  // );
+  // // Step 2: Get location hierarchy data
+  console.log("Extracting location hierarchy data...");
+  const locationData = await getLocationHierarchyData(coreData.starSystems);
+  console.log(
+    `Retrieved location data for ${
+      Object.keys(locationData).length
+    } star systems`
+  );
 
-  // // Step 3: Get trading terminal data
-  // console.log("Extracting trading terminal data...");
-  // const terminalData = await getTradingTerminalData(coreData.starSystems);
-  // console.log(
-  //   `Retrieved ${terminalData.allTerminals.length} terminals and ${terminalData.terminalDistances.length} terminal distances`
-  // );
+  // Step 3: Get trading terminal data
+  console.log("Extracting trading terminal data...");
+  const terminalData = await getTradingTerminalData(coreData.starSystems);
+  console.log(
+    `Retrieved ${terminalData.allTerminals.length} terminals and ${terminalData.terminalDistances.length} terminal distances`
+  );
 
-  // // Step 4: Get commodity trading data
-  // console.log("Extracting commodity trading data...");
-  // const commodityData = await getCommodityTradingData(
-  //   terminalData.majorTerminals
-  // );
-  // console.log(
-  //   `Retrieved ${commodityData.commodities.length} commodities and ${commodityData.allCommodityPrices.length} price entries`
-  // );
+  // Step 4: Get commodity trading data
+  console.log("Extracting commodity trading data...");
+  const commodityData = await getCommodityTradingData(
+    terminalData.majorTerminals
+  );
+  console.log(
+    `Retrieved ${commodityData.commodities.length} commodities and ${commodityData.allCommodityPrices.length} price entries`
+  );
 
-  // // Step 5: Get fuel data
-  // console.log("Extracting fuel data...");
-  // const fuelData = await getFuelData();
-  // console.log(`Retrieved fuel prices data`);
+  // Step 5: Get fuel data
+  console.log("Extracting fuel data...");
+  const fuelData = await getFuelData();
+  console.log(`Retrieved fuel prices data`);
 
-  // // Step 6: Get vehicle data
-  // console.log("Extracting vehicle data...");
-  // const vehicleData = await getVehicleData();
-  // console.log(
-  //   `Retrieved ${vehicleData.vehicles.length} vehicles and ${vehicleData.vehicleLoaners.length} loaner entries`
-  // );
+  // Step 6: Get vehicle data
+  console.log("Extracting vehicle data...");
+  const vehicleData = await getVehicleData();
+  console.log(
+    `Retrieved ${vehicleData.vehicles.length} vehicles and ${vehicleData.vehicleLoaners.length} loaner entries`
+  );
 
-  // // Step 7: Get items data
-  // console.log("Extracting items data...");
-  // const itemsData = await getItemsData();
-  // console.log(
-  //   `Retrieved ${itemsData.items.length} items across ${itemsData.categories.length} categories`
-  // );
+  // Step 7: Get items data
+  console.log("Extracting items data...");
+  const itemsData = await getItemsData();
+  console.log(
+    `Retrieved ${itemsData.items.length} items across ${itemsData.categories.length} categories`
+  );
 
   // Step 8: Get refinery data
   console.log("Extracting refinery data...");
@@ -473,23 +473,23 @@ export async function extractUEXData() {
   const dataExtracts = await getDataExtracts();
   console.log(`Retrieved special data extracts`);
 
-  // // Step 10: Assemble the complete dataset
-  // const completeData = {
-  //   metadata: {
-  //     extractionDate: new Date().toISOString(),
-  //     gameVersion: coreData.gameVersions.live,
-  //   },
-  //   core: coreData,
-  //   locations: locationData,
-  //   terminals: terminalData,
-  //   commodities: commodityData,
-  //   fuel: fuelData,
-  //   vehicles: vehicleData,
-  //   items: itemsData,
-  //   refineries: refineryData,
-  //   extracts: dataExtracts,
-  // };
+  // Step 10: Assemble the complete dataset
+  const completeData = {
+    metadata: {
+      extractionDate: new Date().toISOString(),
+      gameVersion: coreData.gameVersions.live,
+    },
+    core: coreData,
+    locations: locationData,
+    terminals: terminalData,
+    commodities: commodityData,
+    fuel: fuelData,
+    vehicles: vehicleData,
+    items: itemsData,
+    refineries: refineryData,
+    extracts: dataExtracts,
+  };
 
-  // console.log("UEX data extraction complete!");
-  // return completeData;
+  console.log("UEX data extraction complete!");
+  return completeData;
 }
