@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uex } from "..";
+import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // Define the schema for moon information based on the API documentation
@@ -28,7 +28,7 @@ const UEXMoonObject = z.object({
 
 export type UEXMoon = z.infer<typeof UEXMoonObject>;
 
-const UEXMoonsResponseObject = uex.core.getValidationObject(UEXMoonObject);
+const UEXMoonsResponseObject = getValidationObject(UEXMoonObject);
 
 export type UEXMoonsResponse = z.infer<typeof UEXMoonsResponseObject>;
 export type UEXMoonsList = z.infer<typeof UEXMoonObject>[];
@@ -54,7 +54,7 @@ export async function listMoons({
 } = {}): Promise<UEXMoonsList> {
   const endpoint: UEXEndpoint = "moons";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXMoonsResponseObject,

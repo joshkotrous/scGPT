@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uex } from "..";
+import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // Define the schema for faction information based on the API documentation
@@ -18,8 +18,7 @@ const UEXFactionObject = z.object({
 
 export type UEXFaction = z.infer<typeof UEXFactionObject>;
 
-const UEXFactionsResponseObject =
-  uex.core.getValidationObject(UEXFactionObject);
+const UEXFactionsResponseObject = getValidationObject(UEXFactionObject);
 
 export type UEXFactionsResponse = z.infer<typeof UEXFactionsResponseObject>;
 export type UEXFactionsList = z.infer<typeof UEXFactionObject>[];
@@ -32,7 +31,7 @@ export type UEXFactionsList = z.infer<typeof UEXFactionObject>[];
 export async function listAllFactions(): Promise<UEXFactionsList> {
   const endpoint: UEXEndpoint = "factions";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     validationObject: UEXFactionsResponseObject,
   });

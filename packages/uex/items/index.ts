@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uex } from "..";
+import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // 1. /items endpoint schema
@@ -29,7 +29,7 @@ const UEXItemObject = z.object({
 
 export type UEXItem = z.infer<typeof UEXItemObject>;
 
-const UEXItemsResponseObject = uex.core.getValidationObject(UEXItemObject);
+const UEXItemsResponseObject = getValidationObject(UEXItemObject);
 
 export type UEXItemsResponse = z.infer<typeof UEXItemsResponseObject>;
 export type UEXItemsList = z.infer<typeof UEXItemObject>[];
@@ -52,7 +52,7 @@ const UEXItemAttributeObject = z.object({
 
 export type UEXItemAttribute = z.infer<typeof UEXItemAttributeObject>;
 
-const UEXItemAttributesResponseObject = uex.core.getValidationObject(
+const UEXItemAttributesResponseObject = getValidationObject(
   UEXItemAttributeObject
 );
 
@@ -136,8 +136,7 @@ const UEXItemPriceObject = z.object({
 
 export type UEXItemPrice = z.infer<typeof UEXItemPriceObject>;
 
-const UEXItemPricesResponseObject =
-  uex.core.getValidationObject(UEXItemPriceObject);
+const UEXItemPricesResponseObject = getValidationObject(UEXItemPriceObject);
 
 export type UEXItemPricesResponse = z.infer<typeof UEXItemPricesResponseObject>;
 export type UEXItemPricesList = z.infer<typeof UEXItemPriceObject>[];
@@ -159,7 +158,7 @@ const UEXItemPriceAllObject = z.object({
 
 export type UEXItemPriceAll = z.infer<typeof UEXItemPriceAllObject>;
 
-const UEXItemPricesAllResponseObject = uex.core.getValidationObject(
+const UEXItemPricesAllResponseObject = getValidationObject(
   UEXItemPriceAllObject
 );
 
@@ -208,7 +207,7 @@ export async function listItems({
     );
   }
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXItemsResponseObject,
@@ -236,7 +235,7 @@ export async function listItemAttributes({
     );
   }
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXItemAttributesResponseObject,
@@ -264,7 +263,7 @@ export async function listItemPrices({
     );
   }
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXItemPricesResponseObject,
@@ -281,7 +280,7 @@ export async function listItemPrices({
 export async function listAllItemPrices(): Promise<UEXItemPricesAllResponse> {
   const endpoint: UEXEndpoint = "items_prices_all";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     validationObject: UEXItemPricesAllResponseObject,
   });

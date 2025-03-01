@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uex } from "..";
+import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // Define the schema for outpost information based on the API documentation
@@ -48,8 +48,7 @@ const UEXOutpostObject = z.object({
 
 export type UEXOutpost = z.infer<typeof UEXOutpostObject>;
 
-const UEXOutpostsResponseObject =
-  uex.core.getValidationObject(UEXOutpostObject);
+const UEXOutpostsResponseObject = getValidationObject(UEXOutpostObject);
 
 export type UEXOutpostsResponse = z.infer<typeof UEXOutpostsResponseObject>;
 export type UEXOutpostsList = z.infer<typeof UEXOutpostObject>[];
@@ -77,7 +76,7 @@ export async function listOutposts({
 } = {}): Promise<UEXOutpostsList> {
   const endpoint: UEXEndpoint = "outposts";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXOutpostsResponseObject,

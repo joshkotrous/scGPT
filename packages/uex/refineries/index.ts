@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uex } from "..";
+import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // 1. Define schema for refineries audits
@@ -40,7 +40,7 @@ const UEXRefineryAuditObject = z.object({
 
 export type UEXRefineryAudit = z.infer<typeof UEXRefineryAuditObject>;
 
-const UEXRefineryAuditsResponseObject = uex.core.getValidationObject(
+const UEXRefineryAuditsResponseObject = getValidationObject(
   UEXRefineryAuditObject
 );
 
@@ -78,7 +78,7 @@ const UEXRefineryCapacityObject = z.object({
 
 export type UEXRefineryCapacity = z.infer<typeof UEXRefineryCapacityObject>;
 
-const UEXRefineryCapacitiesResponseObject = uex.core.getValidationObject(
+const UEXRefineryCapacitiesResponseObject = getValidationObject(
   UEXRefineryCapacityObject
 );
 
@@ -100,7 +100,7 @@ const UEXRefineryMethodObject = z.object({
 
 export type UEXRefineryMethod = z.infer<typeof UEXRefineryMethodObject>;
 
-const UEXRefineryMethodsResponseObject = uex.core.getValidationObject(
+const UEXRefineryMethodsResponseObject = getValidationObject(
   UEXRefineryMethodObject
 );
 
@@ -139,7 +139,7 @@ const UEXRefineryYieldObject = z.object({
 
 export type UEXRefineryYield = z.infer<typeof UEXRefineryYieldObject>;
 
-const UEXRefineryYieldsResponseObject = uex.core.getValidationObject(
+const UEXRefineryYieldsResponseObject = getValidationObject(
   UEXRefineryYieldObject
 );
 
@@ -155,7 +155,7 @@ export type UEXRefineryYieldsResponse = z.infer<
 export async function listRefineryAudits(): Promise<UEXRefineryAuditsResponse> {
   const endpoint: UEXEndpoint = "refineries_audits";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     validationObject: UEXRefineryAuditsResponseObject,
   });
@@ -171,7 +171,7 @@ export async function listRefineryAudits(): Promise<UEXRefineryAuditsResponse> {
 export async function listRefineryCapacities(): Promise<UEXRefineryCapacitiesResponse> {
   const endpoint: UEXEndpoint = "refineries_capacities";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     validationObject: UEXRefineryCapacitiesResponseObject,
   });
@@ -187,7 +187,7 @@ export async function listRefineryCapacities(): Promise<UEXRefineryCapacitiesRes
 export async function listRefineryMethods(): Promise<UEXRefineryMethodsResponse> {
   const endpoint: UEXEndpoint = "refineries_methods";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     validationObject: UEXRefineryMethodsResponseObject,
   });
@@ -203,7 +203,7 @@ export async function listRefineryMethods(): Promise<UEXRefineryMethodsResponse>
 export async function listRefineryYields(): Promise<UEXRefineryYieldsResponse> {
   const endpoint: UEXEndpoint = "refineries_yields";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     validationObject: UEXRefineryYieldsResponseObject,
   });

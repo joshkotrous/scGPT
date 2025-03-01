@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uex } from "..";
+import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // Define the schema for space station information based on the API documentation
@@ -50,7 +50,7 @@ const UEXSpaceStationObject = z.object({
 
 export type UEXSpaceStation = z.infer<typeof UEXSpaceStationObject>;
 
-const UEXSpaceStationsResponseObject = uex.core.getValidationObject(
+const UEXSpaceStationsResponseObject = getValidationObject(
   UEXSpaceStationObject
 );
 
@@ -83,7 +83,7 @@ export async function listSpaceStations({
 } = {}): Promise<UEXSpaceStationsList> {
   const endpoint: UEXEndpoint = "space_stations";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXSpaceStationsResponseObject,

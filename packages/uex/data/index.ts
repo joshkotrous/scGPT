@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uex } from "..";
+import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // Define valid data extract types
@@ -28,7 +28,7 @@ export async function getDataExtract(
 ): Promise<UEXDataExtractResponse> {
   const endpoint: UEXEndpoint = "data_extract";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: { data: dataType },
     validationObject: UEXDataExtractResponseObject,

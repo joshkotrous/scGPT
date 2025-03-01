@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uex } from "..";
+import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 const UEXCityObject = z.object({
@@ -45,7 +45,7 @@ const UEXCityObject = z.object({
   jurisdiction_name: z.string().nullable(),
 });
 
-const UEXCityResponseObject = uex.core.getValidationObject(UEXCityObject);
+const UEXCityResponseObject = getValidationObject(UEXCityObject);
 export type UEXCityResponse = z.infer<typeof UEXCityResponseObject>;
 
 export async function listCities({
@@ -88,7 +88,7 @@ export async function listCities({
     queryParams.id_moon = String(filter.moonId);
   }
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: Object.keys(queryParams).length > 0 ? queryParams : undefined,
     validationObject: UEXCityResponseObject,

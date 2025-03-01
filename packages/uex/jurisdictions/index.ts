@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uex } from "..";
+import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // Define the schema for jurisdiction information based on the API documentation
@@ -20,7 +20,7 @@ const UEXJurisdictionObject = z.object({
 
 export type UEXJurisdiction = z.infer<typeof UEXJurisdictionObject>;
 
-const UEXJurisdictionsResponseObject = uex.core.getValidationObject(
+const UEXJurisdictionsResponseObject = getValidationObject(
   UEXJurisdictionObject
 );
 
@@ -36,7 +36,7 @@ export type UEXJurisdictionsResponse = z.infer<
 export async function listAllJurisdictions(): Promise<UEXJurisdictionsResponse> {
   const endpoint: UEXEndpoint = "jurisdictions";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     validationObject: UEXJurisdictionsResponseObject,
   });

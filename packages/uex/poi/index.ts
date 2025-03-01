@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uex } from "..";
+import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // Define the schema for POI information based on the API documentation
@@ -54,7 +54,7 @@ const UEXPointOfInterestObject = z.object({
 
 export type UEXPointOfInterest = z.infer<typeof UEXPointOfInterestObject>;
 
-const UEXPointsOfInterestResponseObject = uex.core.getValidationObject(
+const UEXPointsOfInterestResponseObject = getValidationObject(
   UEXPointOfInterestObject
 );
 
@@ -91,7 +91,7 @@ export async function listPointsOfInterest({
 } = {}): Promise<UEXPointsOfInterestList> {
   const endpoint: UEXEndpoint = "poi";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXPointsOfInterestResponseObject,

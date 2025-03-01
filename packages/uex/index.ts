@@ -1,4 +1,3 @@
-import * as core from "./core";
 import * as categories from "./categories";
 import * as cities from "./cities";
 import * as commodities from "./commodities";
@@ -21,7 +20,6 @@ import * as terminals from "./terminals";
 import * as vehicles from "./vehicles";
 
 export const uex = {
-  core,
   categories,
   cities,
   commodities,

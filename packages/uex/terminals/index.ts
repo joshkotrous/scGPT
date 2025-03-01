@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uex } from "..";
+import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // Define the schema for terminal information based on the API documentation
@@ -57,8 +57,7 @@ const UEXTerminalObject = z.object({
 
 export type UEXTerminal = z.infer<typeof UEXTerminalObject>;
 
-const UEXTerminalsResponseObject =
-  uex.core.getValidationObject(UEXTerminalObject);
+const UEXTerminalsResponseObject = getValidationObject(UEXTerminalObject);
 
 export type UEXTerminalsResponse = z.infer<typeof UEXTerminalsResponseObject>;
 export type UEXTerminalsList = z.infer<typeof UEXTerminalObject>[];
@@ -114,7 +113,7 @@ export async function listTerminals({
 } = {}): Promise<UEXTerminalsList> {
   const endpoint: UEXEndpoint = "terminals";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXTerminalsResponseObject,
@@ -146,7 +145,7 @@ export async function getTerminalDistance({
     );
   }
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXTerminalDistanceObject,

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uex } from "..";
+import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 const UEXCategoryObject = z.object({
@@ -22,10 +22,9 @@ const UEXCategoryAttributesObject = z.object({
   date_modified: z.number(),
 });
 
-const UEXCategoryResponseObject =
-  uex.core.getValidationObject(UEXCategoryObject);
+const UEXCategoryResponseObject = getValidationObject(UEXCategoryObject);
 
-const UEXCategoryAttributesResponseObject = uex.core.getValidationObject(
+const UEXCategoryAttributesResponseObject = getValidationObject(
   UEXCategoryAttributesObject
 );
 
@@ -55,7 +54,7 @@ export async function listCategories({
     queryParams.section = filter.section;
   }
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: Object.keys(queryParams).length > 0 ? queryParams : undefined,
     validationObject: UEXCategoryObject,
@@ -77,7 +76,7 @@ export async function listCategoriesAttributes({
     queryParams.id_category = String(filter.categoryId);
   }
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: Object.keys(queryParams).length > 0 ? queryParams : undefined,
     validationObject: UEXCategoryAttributesResponseObject,

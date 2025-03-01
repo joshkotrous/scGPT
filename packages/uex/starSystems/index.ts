@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uex } from "..";
+import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // Define the schema for star system information based on the API documentation
@@ -22,8 +22,7 @@ const UEXStarSystemObject = z.object({
 
 export type UEXStarSystem = z.infer<typeof UEXStarSystemObject>;
 
-const UEXStarSystemsResponseObject =
-  uex.core.getValidationObject(UEXStarSystemObject);
+const UEXStarSystemsResponseObject = getValidationObject(UEXStarSystemObject);
 
 export type UEXStarSystemsResponse = z.infer<
   typeof UEXStarSystemsResponseObject
@@ -39,7 +38,7 @@ export type UEXStarSystemsList = z.infer<typeof UEXStarSystemObject>[];
 export async function listStarSystems(): Promise<UEXStarSystemsList> {
   const endpoint: UEXEndpoint = "star_systems";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     validationObject: UEXStarSystemsResponseObject,
   });

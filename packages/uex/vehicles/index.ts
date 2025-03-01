@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uex } from "..";
+import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // 1. Define schema for /vehicles endpoint
@@ -71,8 +71,7 @@ const UEXVehicleObject = z.object({
 
 export type UEXVehicle = z.infer<typeof UEXVehicleObject>;
 
-const UEXVehiclesResponseObject =
-  uex.core.getValidationObject(UEXVehicleObject);
+const UEXVehiclesResponseObject = getValidationObject(UEXVehicleObject);
 
 export type UEXVehiclesResponse = z.infer<typeof UEXVehiclesResponseObject>;
 export type UEXVehiclesList = z.infer<typeof UEXVehicleObject>[];
@@ -205,7 +204,7 @@ const UEXVehiclePriceObject = z.object({
 
 export type UEXVehiclePrice = z.infer<typeof UEXVehiclePriceObject>;
 
-const UEXVehiclePricesResponseObject = uex.core.getValidationObject(
+const UEXVehiclePricesResponseObject = getValidationObject(
   UEXVehiclePriceObject
 );
 
@@ -258,7 +257,7 @@ export type UEXVehiclePurchasePrice = z.infer<
   typeof UEXVehiclePurchasePriceObject
 >;
 
-const UEXVehiclePurchasePricesResponseObject = uex.core.getValidationObject(
+const UEXVehiclePurchasePricesResponseObject = getValidationObject(
   UEXVehiclePurchasePriceObject
 );
 
@@ -285,7 +284,7 @@ export type UEXVehiclePurchasePriceAll = z.infer<
   typeof UEXVehiclePurchasePriceAllObject
 >;
 
-const UEXVehiclePurchasePricesAllResponseObject = uex.core.getValidationObject(
+const UEXVehiclePurchasePricesAllResponseObject = getValidationObject(
   UEXVehiclePurchasePriceAllObject
 );
 
@@ -338,7 +337,7 @@ const UEXVehicleRentalPriceObject = z.object({
 
 export type UEXVehicleRentalPrice = z.infer<typeof UEXVehicleRentalPriceObject>;
 
-const UEXVehicleRentalPricesResponseObject = uex.core.getValidationObject(
+const UEXVehicleRentalPricesResponseObject = getValidationObject(
   UEXVehicleRentalPriceObject
 );
 
@@ -365,7 +364,7 @@ export type UEXVehicleRentalPriceAll = z.infer<
   typeof UEXVehicleRentalPriceAllObject
 >;
 
-const UEXVehicleRentalPricesAllResponseObject = uex.core.getValidationObject(
+const UEXVehicleRentalPricesAllResponseObject = getValidationObject(
   UEXVehicleRentalPriceAllObject
 );
 
@@ -417,7 +416,7 @@ export async function listVehicles({
 } = {}): Promise<UEXVehiclesList> {
   const endpoint: UEXEndpoint = "vehicles";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXVehiclesResponseObject,
@@ -445,7 +444,7 @@ export async function getVehicleLoaners({
     );
   }
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXVehicleLoanersObject,
@@ -467,7 +466,7 @@ export async function listVehiclePrices({
 } = {}): Promise<UEXVehiclePricesResponse> {
   const endpoint: UEXEndpoint = "vehicles_prices";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXVehiclePricesResponseObject,
@@ -495,7 +494,7 @@ export async function listVehiclePurchasePrices({
     );
   }
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXVehiclePurchasePricesResponseObject,
@@ -512,7 +511,7 @@ export async function listVehiclePurchasePrices({
 export async function listAllVehiclePurchasePrices(): Promise<UEXVehiclePurchasePricesAllList> {
   const endpoint: UEXEndpoint = "vehicles_purchases_prices_all";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     validationObject: UEXVehiclePurchasePricesAllResponseObject,
   });
@@ -539,7 +538,7 @@ export async function listVehicleRentalPrices({
     );
   }
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXVehicleRentalPricesResponseObject,
@@ -556,7 +555,7 @@ export async function listVehicleRentalPrices({
 export async function listAllVehicleRentalPrices(): Promise<UEXVehicleRentalPricesAllResponse> {
   const endpoint: UEXEndpoint = "vehicles_rentals_prices_all";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     validationObject: UEXVehicleRentalPricesAllResponseObject,
   });

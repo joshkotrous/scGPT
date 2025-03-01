@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uex } from "..";
+import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // Define the schema for planet information based on the API documentation
@@ -25,7 +25,7 @@ const UEXPlanetObject = z.object({
 
 export type UEXPlanet = z.infer<typeof UEXPlanetObject>;
 
-const UEXPlanetsResponseObject = uex.core.getValidationObject(UEXPlanetObject);
+const UEXPlanetsResponseObject = getValidationObject(UEXPlanetObject);
 
 export type UEXPlanetsResponse = z.infer<typeof UEXPlanetsResponseObject>;
 export type UEXPlanetsList = z.infer<typeof UEXPlanetObject>[];
@@ -51,7 +51,7 @@ export async function listPlanets({
 } = {}): Promise<UEXPlanetsList> {
   const endpoint: UEXEndpoint = "planets";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXPlanetsResponseObject,

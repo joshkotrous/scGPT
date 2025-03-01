@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uex } from "..";
+import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 const UEXCompanyObject = z.object({
@@ -17,8 +17,7 @@ const UEXCompanyObject = z.object({
 
 export type UEXCompany = z.infer<typeof UEXCompanyObject>;
 
-const UEXCompaniesResponseObject =
-  uex.core.getValidationObject(UEXCompanyObject);
+const UEXCompaniesResponseObject = getValidationObject(UEXCompanyObject);
 
 export type UEXCompaniesResponse = z.infer<typeof UEXCompaniesResponseObject>;
 
@@ -40,7 +39,7 @@ export async function listAllCompanies({
 } = {}): Promise<UEXCompaniesResponse> {
   const endpoint: UEXEndpoint = "companies";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXCompaniesResponseObject,

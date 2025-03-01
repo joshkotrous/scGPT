@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uex } from "..";
+import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 const UEXCommodityObject = z.object({
@@ -29,7 +29,7 @@ const UEXCommodityObject = z.object({
 });
 
 const UEXListCommoditiesResponseObject =
-  uex.core.getValidationObject(UEXCommodityObject);
+  getValidationObject(UEXCommodityObject);
 
 export type UEXListCommoditiesResponse = z.infer<
   typeof UEXListCommoditiesResponseObject
@@ -133,7 +133,7 @@ const UEXCommodityAverageObject = z.object({
 
 export type UEXCommodityAverage = z.infer<typeof UEXCommodityAverageObject>;
 
-const UEXListCommodityAveragesResponseObject = uex.core.getValidationObject(
+const UEXListCommodityAveragesResponseObject = getValidationObject(
   UEXCommodityAverageObject
 );
 
@@ -281,7 +281,7 @@ const UEXCommodityPriceObject = z.object({
 
 export type UEXCommodityPrice = z.infer<typeof UEXCommodityPriceObject>;
 
-const UEXCommodityPricesResponseObject = uex.core.getValidationObject(
+const UEXCommodityPricesResponseObject = getValidationObject(
   UEXCommodityPriceObject
 );
 
@@ -291,7 +291,7 @@ export type UEXCommodityPricesResponse = z.infer<
 
 export async function listCommodities(): Promise<UEXListCommoditiesList> {
   const endpoint: UEXEndpoint = "commodities";
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     validationObject: UEXListCommoditiesResponseObject,
   });
@@ -337,7 +337,7 @@ const UEXCommodityPriceAllObject = z.object({
 
 export type UEXCommodityPriceAll = z.infer<typeof UEXCommodityPriceAllObject>;
 
-const UEXCommodityPricesAllResponseObject = uex.core.getValidationObject(
+const UEXCommodityPricesAllResponseObject = getValidationObject(
   UEXCommodityPriceAllObject
 );
 
@@ -397,7 +397,7 @@ export type UEXCommodityPriceHistory = z.infer<
   typeof UEXCommodityPriceHistoryObject
 >;
 
-const UEXCommodityPricesHistoryResponseObject = uex.core.getValidationObject(
+const UEXCommodityPricesHistoryResponseObject = getValidationObject(
   UEXCommodityPriceHistoryObject
 );
 
@@ -447,7 +447,7 @@ const UEXCommodityRankingObject = z.object({
 
 export type UEXCommodityRanking = z.infer<typeof UEXCommodityRankingObject>;
 
-const UEXListCommodityRankingResponseObject = uex.core.getValidationObject(
+const UEXListCommodityRankingResponseObject = getValidationObject(
   UEXCommodityRankingObject
 );
 
@@ -509,7 +509,7 @@ const UEXCommodityRawPriceObject = z.object({
 
 export type UEXCommodityRawPrice = z.infer<typeof UEXCommodityRawPriceObject>;
 
-const UEXListCommodityRawPricesResponseObject = uex.core.getValidationObject(
+const UEXListCommodityRawPricesResponseObject = getValidationObject(
   UEXCommodityRawPriceObject
 );
 
@@ -542,7 +542,7 @@ export type UEXCommodityRawPriceAll = z.infer<
   typeof UEXCommodityRawPriceAllObject
 >;
 
-const UEXCommodityRawPricesAllResponseObject = uex.core.getValidationObject(
+const UEXCommodityRawPricesAllResponseObject = getValidationObject(
   UEXCommodityRawPriceAllObject
 );
 
@@ -561,7 +561,7 @@ const UEXCommodityStatusObject = z.object({
 
 export type UEXCommodityStatus = z.infer<typeof UEXCommodityStatusObject>;
 
-const UEXCommodityStatusResponseObject = uex.core.getValidationObject(
+const UEXCommodityStatusResponseObject = getValidationObject(
   UEXCommodityStatusObject
 );
 
@@ -581,7 +581,7 @@ export async function listCommoditiesAverages({
   filter: { commodityId: number };
 }): Promise<UEXCommodityAverageList> {
   const endpoint: UEXEndpoint = "commodities_averages";
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: { id_commodity: filter.commodityId },
     validationObject: UEXListCommodityAveragesResponseObject,
@@ -602,7 +602,7 @@ export async function listCommoditiesPrices({
     );
   }
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXCommodityPricesResponseObject,
@@ -613,7 +613,7 @@ export async function listCommoditiesPrices({
 
 export async function listAllCommoditiesPrices(): Promise<UEXCommodityPricesAllList> {
   const endpoint: UEXEndpoint = "commodities_prices_all";
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     validationObject: UEXCommodityPricesAllResponseObject,
   });
@@ -639,7 +639,7 @@ export async function listCommoditiesPricesHistory({
     );
   }
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXCommodityPricesHistoryResponseObject,
@@ -651,7 +651,7 @@ export async function listCommoditiesPricesHistory({
 export async function listCommoditiesRanking(): Promise<UEXCommodityRankingList> {
   const endpoint: UEXEndpoint = "commodities_ranking";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     validationObject: UEXListCommodityRankingResponseObject,
   });
@@ -672,7 +672,7 @@ export async function listCommoditiesRawPrices({
     );
   }
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXListCommodityRawPricesResponseObject,
@@ -684,7 +684,7 @@ export async function listCommoditiesRawPrices({
 export async function listAllCommoditiesRawPrices(): Promise<UEXCommodityRawPricesAllResponse> {
   const endpoint: UEXEndpoint = "commodities_raw_prices_all";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     validationObject: UEXCommodityRawPricesAllResponseObject,
   });
@@ -695,7 +695,7 @@ export async function listAllCommoditiesRawPrices(): Promise<UEXCommodityRawPric
 export async function listCommoditiesStatus(): Promise<UEXCommodityStatusResponse> {
   const endpoint: UEXEndpoint = "commodities_status";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     validationObject: UEXCommodityStatusResponseObject,
   });

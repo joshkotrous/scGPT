@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uex } from "..";
+import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "@uex/core";
 
 // Define the schema for game versions information based on the API documentation
@@ -18,7 +18,7 @@ export type UEXGameVersions = z.infer<typeof UEXGameVersionsObject>;
 export async function listGameVersions(): Promise<UEXGameVersions> {
   const endpoint: UEXEndpoint = "game_versions";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     validationObject: UEXGameVersionsObject,
   });

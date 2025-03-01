@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uex } from "..";
+import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // Define the schema for fuel price information based on the API documentation
@@ -53,8 +53,7 @@ const UEXFuelPriceObject = z.object({
 
 export type UEXFuelPrice = z.infer<typeof UEXFuelPriceObject>;
 
-const UEXFuelPricesResponseObject =
-  uex.core.getValidationObject(UEXFuelPriceObject);
+const UEXFuelPricesResponseObject = getValidationObject(UEXFuelPriceObject);
 
 export type UEXFuelPricesResponse = z.infer<typeof UEXFuelPricesResponseObject>;
 
@@ -76,7 +75,7 @@ const UEXFuelPriceAllObject = z.object({
 
 export type UEXFuelPriceAll = z.infer<typeof UEXFuelPriceAllObject>;
 
-const UEXFuelPricesAllResponseObject = uex.core.getValidationObject(
+const UEXFuelPricesAllResponseObject = getValidationObject(
   UEXFuelPriceAllObject
 );
 
@@ -115,7 +114,7 @@ export async function listFuelPrices({
     );
   }
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXFuelPricesResponseObject,
@@ -132,7 +131,7 @@ export async function listFuelPrices({
 export async function listAllFuelPrices(): Promise<UEXFuelPricesAllResponse> {
   const endpoint: UEXEndpoint = "fuel_prices_all";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     validationObject: UEXFuelPricesAllResponseObject,
   });

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { uex } from "..";
+import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // 1. Define the schema for orbit information
@@ -29,7 +29,7 @@ const UEXOrbitObject = z.object({
 
 export type UEXOrbit = z.infer<typeof UEXOrbitObject>;
 
-const UEXOrbitsResponseObject = uex.core.getValidationObject(UEXOrbitObject);
+const UEXOrbitsResponseObject = getValidationObject(UEXOrbitObject);
 
 export type UEXOrbitsResponse = z.infer<typeof UEXOrbitsResponseObject>;
 export type UEXOrbitsList = z.infer<typeof UEXOrbitObject>[];
@@ -53,7 +53,7 @@ const UEXOrbitDistanceObject = z.object({
 
 export type UEXOrbitDistance = z.infer<typeof UEXOrbitDistanceObject>;
 
-const UEXOrbitDistancesResponseObject = uex.core.getValidationObject(
+const UEXOrbitDistancesResponseObject = getValidationObject(
   UEXOrbitDistanceObject
 );
 
@@ -91,7 +91,7 @@ export async function listOrbits({
 } = {}): Promise<UEXOrbitsList> {
   const endpoint: UEXEndpoint = "orbits";
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXOrbitsResponseObject,
@@ -119,7 +119,7 @@ export async function listOrbitDistances({
     );
   }
 
-  const result = await uex.core.queryUEX({
+  const result = await queryUEX({
     endpoint,
     queryParams: filter,
     validationObject: UEXOrbitDistancesResponseObject,
