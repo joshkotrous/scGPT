@@ -1,7 +1,56 @@
 import { z } from "zod";
 import { uex } from "../../../uex";
+import { UEXFactionObject, UEXFactionsList } from "../../../uex/factions/types";
 import {
-  UEXCommodity,
+  UEXGameVersions,
+  UEXGameVersionsObject,
+} from "../../../uex/gameVersions/types";
+import {
+  UEXItemAttributeObject,
+  UEXItemAttributesList,
+  UEXItemObject,
+  UEXItemPriceAllObject,
+  UEXItemsList,
+} from "../../../uex/items/types";
+import {
+  UEXJurisdictionObject,
+  UEXJurisdictionsList,
+} from "../../../uex/jurisdictions/types";
+import {
+  UEXRefineryAuditObject,
+  UEXRefineryCapacityObject,
+  UEXRefineryMethodObject,
+  UEXRefineryMethodsList,
+  UEXRefineryYieldObject,
+} from "../../../uex/refineries/types";
+import {
+  UEXStarSystemObject,
+  UEXStarSystemsList,
+} from "../../../uex/starSystems/types";
+import {
+  UEXTerminalDistance,
+  UEXTerminalDistanceObject,
+  UEXTerminalObject,
+  UEXTerminalsList,
+} from "../../../uex/terminals/types";
+import {
+  UEXVehicleLoanersList,
+  UEXVehicleLoanersObject,
+  UEXVehicleObject,
+  UEXVehiclePriceObject,
+  UEXVehiclePurchasePriceAllObject,
+  UEXVehicleRentalPriceAllObject,
+} from "../../../uex/vehicles/types";
+import { UEXFuelPriceAllObject } from "@uex/fuelPrices/types";
+import {
+  EnhancedPlanet,
+  LocationSystemData,
+  LocationSystemDataObject,
+  UEXPlatformDataExtraction,
+  UEXPlatformDataExtractionMaps,
+} from "./types";
+import { UEXCategoryObject } from "@uex/categories/types";
+import {
   UEXCommodityAverageList,
   UEXCommodityAverageObject,
   UEXCommodityObject,
@@ -12,92 +61,9 @@ import {
   UEXCommodityRawPriceAllObject,
   UEXCommodityStatus,
   UEXCommodityStatusObject,
-  UEXCommodityStatusResponse,
-} from "../../../uex/commodities";
-import {
-  UEXCompaniesList,
-  UEXCompaniesResponse,
-  UEXCompanyObject,
-} from "../../../uex/companies";
-import {
-  UEXFaction,
-  UEXFactionObject,
-  UEXFactionsList,
-} from "../../../uex/factions";
-import {
-  UEXGameVersions,
-  UEXGameVersionsObject,
-} from "../../../uex/gameVersions";
-import {
-  UEXItemAttributeObject,
-  UEXItemAttributesList,
-  UEXItemObject,
-  UEXItemPriceAllObject,
-  UEXItemsList,
-} from "../../../uex/items";
-import {
-  UEXJurisdiction,
-  UEXJurisdictionObject,
-  UEXJurisdictionsList,
-  UEXJurisdictionsResponse,
-} from "../../../uex/jurisdictions";
-import { UEXPlanet, UEXPlanetObject } from "../../../uex/planets";
-import {
-  UEXRefineryAuditObject,
-  UEXRefineryCapacityObject,
-  UEXRefineryMethodObject,
-  UEXRefineryMethodsList,
-  UEXRefineryMethodsResponse,
-  UEXRefineryYieldObject,
-} from "../../../uex/refineries";
-import {
-  UEXStarSystem,
-  UEXStarSystemObject,
-  UEXStarSystemsList,
-} from "../../../uex/starSystems";
-import {
-  UEXTerminalDistance,
-  UEXTerminalDistanceObject,
-  UEXTerminalObject,
-  UEXTerminalsList,
-} from "../../../uex/terminals";
-import {
-  UEXVehicleLoanersList,
-  UEXVehicleLoanersObject,
-  UEXVehicleObject,
-  UEXVehiclePriceObject,
-  UEXVehiclePurchasePriceAllObject,
-  UEXVehicleRentalPriceAllObject,
-} from "../../../uex/vehicles";
-import {
-  UEXFuelPriceAllObject,
-  UEXFuelPricesAllResponseObject,
-} from "@uex/fuelPrices";
-import { UEXCategoryObject } from "@uex/categories";
-interface EnhancedPlanet extends UEXPlanet {
-  moons?: any[];
-  outposts?: any[];
-  pois?: any[];
-}
-
-const EnhancedPlanetObject = UEXPlanetObject.extend({
-  moons: z.array(z.any()).optional(),
-  outposts: z.array(z.any()).optional(),
-  pois: z.array(z.any()).optional(),
-});
-
-const LocationSystemDataObject = z.object({
-  system: UEXStarSystemObject,
-  planets: z.array(EnhancedPlanetObject),
-  orbits: z.array(z.any()),
-  spaceStations: z.array(z.any()),
-  outposts: z.array(z.any()),
-  poi: z.array(z.any()),
-  cities: z.array(z.any()),
-  orbitDistances: z.any().optional(),
-});
-
-type LocationSystemData = z.infer<typeof LocationSystemDataObject>;
+} from "@uex/commodities/types";
+import { UEXCompaniesList, UEXCompanyObject } from "@uex/companies/types";
+import { DataExtractType } from "@uex/data/types";
 
 export async function getCoreReferenceData(): Promise<{
   gameVersions: UEXGameVersions;
@@ -459,11 +425,9 @@ export async function getRefineryData() {
 
 export async function getDataExtracts() {
   const [topRoutes, commodityPricesText, recentReports] = await Promise.all([
-    await uex.data.getDataExtract(uex.data.DataExtractType.COMMODITIES_ROUTES),
-    await uex.data.getDataExtract(uex.data.DataExtractType.COMMODITIES_PRICES),
-    await uex.data.getDataExtract(
-      uex.data.DataExtractType.LAST_COMMODITY_DATA_REPORTS
-    ),
+    await uex.data.getDataExtract(DataExtractType.COMMODITIES_ROUTES),
+    await uex.data.getDataExtract(DataExtractType.COMMODITIES_PRICES),
+    await uex.data.getDataExtract(DataExtractType.LAST_COMMODITY_DATA_REPORTS),
   ]);
   return { topRoutes, commodityPricesText, recentReports };
 }
@@ -617,10 +581,6 @@ export const UEXPlatformDataExtractionObject = z.object({
   }),
 });
 
-export type UEXPlatformDataExtraction = z.infer<
-  typeof UEXPlatformDataExtractionObject
->;
-
 export async function processDataForEmbedding(
   extractedData: UEXPlatformDataExtraction
 ) {
@@ -671,13 +631,6 @@ export async function processDataForEmbedding(
   // Save chunks to a file before embedding (in case of issues)
 
   return allChunks;
-}
-
-interface UEXPlatformDataExtractionMaps {
-  factions: Map<number, UEXFaction>;
-  jurisdictions: Map<number, UEXJurisdiction>;
-  starSystems: Map<number, UEXStarSystem>;
-  commodities: Map<number, UEXCommodity>;
 }
 
 export function getExtractionMaps(
