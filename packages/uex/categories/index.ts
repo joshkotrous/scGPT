@@ -2,7 +2,7 @@ import { z } from "zod";
 import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
-const UEXCategoryObject = z.object({
+export const UEXCategoryObject = z.object({
   id: z.number(),
   type: z.string(),
   section: z.string(),
@@ -13,7 +13,7 @@ const UEXCategoryObject = z.object({
   date_modified: z.number(),
 });
 
-const UEXCategoryAttributesObject = z.object({
+export const UEXCategoryAttributesObject = z.object({
   id: z.number(),
   id_category: z.number(),
   name: z.string(),

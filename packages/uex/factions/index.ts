@@ -3,7 +3,7 @@ import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // Define the schema for faction information based on the API documentation
-const UEXFactionObject = z.object({
+export const UEXFactionObject = z.object({
   id: z.number(),
   ids_star_systems: z.string(), // comma separated
   ids_factions_friendly: z.string().nullable(), // comma separated

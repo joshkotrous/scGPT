@@ -57,7 +57,7 @@ const UEXFuelPricesResponseObject = getValidationObject(UEXFuelPriceObject);
 
 export type UEXFuelPricesResponse = z.infer<typeof UEXFuelPricesResponseObject>;
 
-const UEXFuelPriceAllObject = z.object({
+export const UEXFuelPriceAllObject = z.object({
   id: z.number(),
   id_commodity: z.number(),
   id_terminal: z.number(),
@@ -75,13 +75,14 @@ const UEXFuelPriceAllObject = z.object({
 
 export type UEXFuelPriceAll = z.infer<typeof UEXFuelPriceAllObject>;
 
-const UEXFuelPricesAllResponseObject = getValidationObject(
+export const UEXFuelPricesAllResponseObject = getValidationObject(
   UEXFuelPriceAllObject
 );
 
 export type UEXFuelPricesAllResponse = z.infer<
   typeof UEXFuelPricesAllResponseObject
 >;
+export type UEXFuelPricesAllList = z.infer<typeof UEXFuelPriceAllObject>[];
 
 // Filter type for fuel prices endpoint
 export type FuelPricesFilter = {
@@ -128,7 +129,7 @@ export async function listFuelPrices({
  * Retrieves a list of all fuel prices in all terminals, all at once
  * @returns All fuel price data
  */
-export async function listAllFuelPrices(): Promise<UEXFuelPricesAllResponse> {
+export async function listAllFuelPrices(): Promise<UEXFuelPricesAllList> {
   const endpoint: UEXEndpoint = "fuel_prices_all";
 
   const result = await queryUEX({
@@ -136,5 +137,5 @@ export async function listAllFuelPrices(): Promise<UEXFuelPricesAllResponse> {
     validationObject: UEXFuelPricesAllResponseObject,
   });
 
-  return result;
+  return result.data;
 }

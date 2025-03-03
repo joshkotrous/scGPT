@@ -2,7 +2,7 @@ import { z } from "zod";
 import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
-const UEXCompanyObject = z.object({
+export const UEXCompanyObject = z.object({
   id: z.number(),
   id_faction: z.number().optional(),
   name: z.string(),
@@ -20,6 +20,7 @@ export type UEXCompany = z.infer<typeof UEXCompanyObject>;
 const UEXCompaniesResponseObject = getValidationObject(UEXCompanyObject);
 
 export type UEXCompaniesResponse = z.infer<typeof UEXCompaniesResponseObject>;
+export type UEXCompaniesList = z.infer<typeof UEXCompanyObject>[];
 
 export type CompaniesFilter = {
   is_item_manufacturer?: number; // show only item manufacturers
@@ -36,7 +37,7 @@ export async function listAllCompanies({
   filter = {},
 }: {
   filter?: CompaniesFilter;
-} = {}): Promise<UEXCompaniesResponse> {
+} = {}): Promise<UEXCompaniesList> {
   const endpoint: UEXEndpoint = "companies";
 
   const result = await queryUEX({
@@ -45,5 +46,5 @@ export async function listAllCompanies({
     validationObject: UEXCompaniesResponseObject,
   });
 
-  return result;
+  return result.data;
 }

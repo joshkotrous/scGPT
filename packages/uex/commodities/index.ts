@@ -2,7 +2,7 @@ import { z } from "zod";
 import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
-const UEXCommodityObject = z.object({
+export const UEXCommodityObject = z.object({
   id: z.number(),
   id_parent: z.number(),
   name: z.string(),
@@ -34,9 +34,10 @@ const UEXListCommoditiesResponseObject =
 export type UEXListCommoditiesResponse = z.infer<
   typeof UEXListCommoditiesResponseObject
 >;
+export type UEXCommodity = z.infer<typeof UEXCommodityObject>;
 export type UEXListCommoditiesList = z.infer<typeof UEXCommodityObject>[];
 
-const UEXCommodityAverageObject = z.object({
+export const UEXCommodityAverageObject = z.object({
   id: z.number(),
   id_commodity: z.number(),
   price_buy: z.number(),
@@ -309,7 +310,7 @@ export type CommodityPricesFilter = {
   commodity_slug?: string;
 };
 
-const UEXCommodityPriceAllObject = z.object({
+export const UEXCommodityPriceAllObject = z.object({
   id: z.number(),
   id_commodity: z.number(),
   id_terminal: z.number(),
@@ -348,7 +349,7 @@ export type UEXCommodityPricesAllList = z.infer<
   typeof UEXCommodityPriceAllObject
 >[];
 
-const UEXCommodityPriceHistoryObject = z.object({
+export const UEXCommodityPriceHistoryObject = z.object({
   id: z.number(),
   id_commodity: z.number(),
   id_star_system: z.number(),
@@ -415,7 +416,7 @@ export type CommodityPricesHistoryFilter = {
   game_version?: string;
 };
 
-const UEXCommodityRankingObject = z.object({
+export const UEXCommodityRankingObject = z.object({
   id: z.number(),
   code: z.string(),
   slug: z.string(),
@@ -525,7 +526,7 @@ export type CommodityRawPricesFilter = {
   id_commodity?: number;
 };
 
-const UEXCommodityRawPriceAllObject = z.object({
+export const UEXCommodityRawPriceAllObject = z.object({
   id: z.number(),
   id_commodity: z.number(),
   id_terminal: z.number(),
@@ -552,8 +553,11 @@ const UEXCommodityRawPricesAllResponseObject = getValidationObject(
 export type UEXCommodityRawPricesAllResponse = z.infer<
   typeof UEXCommodityRawPricesAllResponseObject
 >;
+export type UEXCommodityRawPricesAllList = z.infer<
+  typeof UEXCommodityRawPriceAllObject
+>[];
 
-const UEXCommodityStatusObject = z.object({
+export const UEXCommodityStatusObject = z.object({
   buy: z.array(
     z.object({
       code: z.number(),
@@ -575,6 +579,7 @@ const UEXCommodityStatusResponseObject = getValidationObject(
 export type UEXCommodityStatusResponse = z.infer<
   typeof UEXCommodityStatusResponseObject
 >;
+export type UEXCommodityList = z.infer<typeof UEXCommodityStatusObject>;
 
 export async function listCommoditiesAlerts({
   filter,
@@ -688,7 +693,7 @@ export async function listCommoditiesRawPrices({
   return result.data;
 }
 
-export async function listAllCommoditiesRawPrices(): Promise<UEXCommodityRawPricesAllResponse> {
+export async function listAllCommoditiesRawPrices(): Promise<UEXCommodityRawPricesAllList> {
   const endpoint: UEXEndpoint = "commodities_raw_prices_all";
 
   const result = await queryUEX({
@@ -696,10 +701,10 @@ export async function listAllCommoditiesRawPrices(): Promise<UEXCommodityRawPric
     validationObject: UEXCommodityRawPricesAllResponseObject,
   });
 
-  return result;
+  return result.data;
 }
 
-export async function listCommoditiesStatus(): Promise<UEXCommodityStatusResponse> {
+export async function listCommoditiesStatus(): Promise<UEXCommodityList> {
   const endpoint: UEXEndpoint = "commodities_status";
 
   const result = await queryUEX({
@@ -707,5 +712,5 @@ export async function listCommoditiesStatus(): Promise<UEXCommodityStatusRespons
     validationObject: UEXCommodityStatusResponseObject,
   });
 
-  return result;
+  return result.data;
 }

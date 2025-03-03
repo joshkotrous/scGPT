@@ -3,7 +3,7 @@ import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // 1. Define schema for /vehicles endpoint
-const UEXVehicleObject = z.object({
+export const UEXVehicleObject = z.object({
   id: z.number(),
   id_company: z.number(), // vehicle manufacturer
   id_parent: z.number(), // parent ship series
@@ -128,14 +128,14 @@ const UEXLoanerVehicleObject = z.object({
 });
 
 // Now define the vehicle with loaners schema
-const UEXVehicleLoanersObject = z.object({
+export const UEXVehicleLoanersObject = z.object({
   id: z.number(),
   id_company: z.number(),
   id_parent: z.number(),
   ids_vehicles_loaners: z.string().nullable(),
   name: z.string(),
   name_full: z.string(),
-  uuid: z.string().nullable(),
+  uuid: z.string().nullable().optional(),
   scu: z.number(),
   crew: z.string(),
   is_addon: z.number(),
@@ -176,7 +176,7 @@ const UEXVehicleLoanersObject = z.object({
   date_added: z.number(),
   date_modified: z.number(),
   company_name: z.string(),
-  loaners: z.array(UEXLoanerVehicleObject),
+  loaners: z.array(UEXLoanerVehicleObject).optional(),
 });
 
 export const UEXVehicleLoanersResponseObject = getValidationObject(
@@ -186,11 +186,11 @@ export const UEXVehicleLoanersResponseObject = getValidationObject(
 export type UEXVehicleLoanersResponse = z.infer<
   typeof UEXVehicleLoanersResponseObject
 >;
-UEXVehicleLoanersResponseObject;
+
 export type UEXVehicleLoanersList = z.infer<typeof UEXVehicleLoanersObject>[];
 
 // 3. Define schema for /vehicles_prices endpoint
-const UEXVehiclePriceObject = z.object({
+export const UEXVehiclePriceObject = z.object({
   id: z.number(),
   id_vehicle: z.number(),
   price: z.number(),
@@ -275,7 +275,7 @@ export type UEXVehiclePurchasePricesList = z.infer<
 >[];
 
 // 5. Define schema for /vehicles_purchases_prices_all endpoint
-const UEXVehiclePurchasePriceAllObject = z.object({
+export const UEXVehiclePurchasePriceAllObject = z.object({
   id: z.number(),
   id_vehicle: z.number(),
   id_terminal: z.number(),
@@ -355,7 +355,7 @@ export type UEXVehicleRentalPricesList = z.infer<
 >[];
 
 // 7. Define schema for /vehicles_rentals_prices_all endpoint
-const UEXVehicleRentalPriceAllObject = z.object({
+export const UEXVehicleRentalPriceAllObject = z.object({
   id: z.number(),
   id_vehicle: z.number(),
   id_terminal: z.number(),
@@ -469,7 +469,7 @@ export async function listVehiclePrices({
   filter = {},
 }: {
   filter?: VehiclePricesFilter;
-} = {}): Promise<UEXVehiclePricesResponse> {
+} = {}): Promise<UEXVehiclePricesList> {
   const endpoint: UEXEndpoint = "vehicles_prices";
 
   const result = await queryUEX({
@@ -558,7 +558,7 @@ export async function listVehicleRentalPrices({
  * Retrieve a list of prices for all vehicles rentals in all terminals, all at once
  * @returns All vehicle rental prices data
  */
-export async function listAllVehicleRentalPrices(): Promise<UEXVehicleRentalPricesAllResponse> {
+export async function listAllVehicleRentalPrices(): Promise<UEXVehicleRentalPricesAllList> {
   const endpoint: UEXEndpoint = "vehicles_rentals_prices_all";
 
   const result = await queryUEX({

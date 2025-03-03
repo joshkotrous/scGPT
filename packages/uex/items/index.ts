@@ -3,7 +3,7 @@ import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // 1. /items endpoint schema
-const UEXItemObject = z.object({
+export const UEXItemObject = z.object({
   id: z.number(), // route ID, may change during website updates
   id_parent: z.number(),
   id_category: z.number(),
@@ -35,7 +35,7 @@ export type UEXItemsResponse = z.infer<typeof UEXItemsResponseObject>;
 export type UEXItemsList = z.infer<typeof UEXItemObject>[];
 
 // 2. /items_attributes endpoint schema
-const UEXItemAttributeObject = z.object({
+export const UEXItemAttributeObject = z.object({
   id: z.number(),
   id_item: z.number(),
   id_category: z.number(),
@@ -142,7 +142,7 @@ export type UEXItemPricesResponse = z.infer<typeof UEXItemPricesResponseObject>;
 export type UEXItemPricesList = z.infer<typeof UEXItemPriceObject>[];
 
 // 4. /items_prices_all endpoint schema
-const UEXItemPriceAllObject = z.object({
+export const UEXItemPriceAllObject = z.object({
   id: z.number(),
   id_item: z.number(),
   id_terminal: z.number(),
@@ -277,7 +277,7 @@ export async function listItemPrices({
  * Retrieve a list of prices for all items in all terminals, all at once
  * @returns All item prices data
  */
-export async function listAllItemPrices(): Promise<UEXItemPricesAllResponse> {
+export async function listAllItemPrices(): Promise<UEXItemPricesAllList> {
   const endpoint: UEXEndpoint = "items_prices_all";
 
   const result = await queryUEX({

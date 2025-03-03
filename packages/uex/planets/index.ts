@@ -3,7 +3,7 @@ import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // Define the schema for planet information based on the API documentation
-const UEXPlanetObject = z.object({
+export const UEXPlanetObject = z.object({
   id: z.number(),
   id_star_system: z.number(),
   id_faction: z.number(),

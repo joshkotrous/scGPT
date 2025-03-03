@@ -3,7 +3,7 @@ import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // Define the schema for terminal information based on the API documentation
-const UEXTerminalObject = z.object({
+export const UEXTerminalObject = z.object({
   id: z.number(),
   id_star_system: z.number(),
   id_planet: z.number(),
@@ -63,7 +63,7 @@ export type UEXTerminalsResponse = z.infer<typeof UEXTerminalsResponseObject>;
 export type UEXTerminalsList = z.infer<typeof UEXTerminalObject>[];
 
 // Define the schema for terminal distances based on the API documentation
-const UEXTerminalDistanceObject = z.object({
+export const UEXTerminalDistanceObject = z.object({
   orbit_name_origin: z.string(),
   terminal_name_origin: z.string(),
   terminal_nickname_origin: z.string(),

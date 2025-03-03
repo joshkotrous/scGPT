@@ -3,7 +3,7 @@ import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // Define the schema for star system information based on the API documentation
-const UEXStarSystemObject = z.object({
+export const UEXStarSystemObject = z.object({
   id: z.number(),
   id_faction: z.number(),
   id_jurisdiction: z.number(),

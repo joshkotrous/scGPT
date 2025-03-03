@@ -1,28 +1,112 @@
+import { z } from "zod";
 import { uex } from "../../../uex";
 import {
+  UEXCommodity,
   UEXCommodityAverageList,
+  UEXCommodityAverageObject,
+  UEXCommodityObject,
+  UEXCommodityPriceAllObject,
+  UEXCommodityPriceHistoryObject,
   UEXCommodityPricesHistoryList,
+  UEXCommodityRankingObject,
+  UEXCommodityRawPriceAllObject,
+  UEXCommodityStatus,
+  UEXCommodityStatusObject,
   UEXCommodityStatusResponse,
 } from "../../../uex/commodities";
-import { UEXCompaniesResponse } from "../../../uex/companies";
-import { UEXFactionsList } from "../../../uex/factions";
-import { UEXGameVersions } from "../../../uex/gameVersions";
-import { UEXItemAttributesList, UEXItemsList } from "../../../uex/items";
-import { UEXJurisdictionsResponse } from "../../../uex/jurisdictions";
-import { UEXPlanet } from "../../../uex/planets";
-import { UEXRefineryMethodsResponse } from "../../../uex/refineries";
-import { UEXStarSystem, UEXStarSystemsList } from "../../../uex/starSystems";
-import { UEXTerminalDistance, UEXTerminalsList } from "../../../uex/terminals";
-import { UEXVehicleLoanersList } from "../../../uex/vehicles";
+import {
+  UEXCompaniesList,
+  UEXCompaniesResponse,
+  UEXCompanyObject,
+} from "../../../uex/companies";
+import {
+  UEXFaction,
+  UEXFactionObject,
+  UEXFactionsList,
+} from "../../../uex/factions";
+import {
+  UEXGameVersions,
+  UEXGameVersionsObject,
+} from "../../../uex/gameVersions";
+import {
+  UEXItemAttributeObject,
+  UEXItemAttributesList,
+  UEXItemObject,
+  UEXItemPriceAllObject,
+  UEXItemsList,
+} from "../../../uex/items";
+import {
+  UEXJurisdiction,
+  UEXJurisdictionObject,
+  UEXJurisdictionsList,
+  UEXJurisdictionsResponse,
+} from "../../../uex/jurisdictions";
+import { UEXPlanet, UEXPlanetObject } from "../../../uex/planets";
+import {
+  UEXRefineryAuditObject,
+  UEXRefineryCapacityObject,
+  UEXRefineryMethodObject,
+  UEXRefineryMethodsList,
+  UEXRefineryMethodsResponse,
+  UEXRefineryYieldObject,
+} from "../../../uex/refineries";
+import {
+  UEXStarSystem,
+  UEXStarSystemObject,
+  UEXStarSystemsList,
+} from "../../../uex/starSystems";
+import {
+  UEXTerminalDistance,
+  UEXTerminalDistanceObject,
+  UEXTerminalObject,
+  UEXTerminalsList,
+} from "../../../uex/terminals";
+import {
+  UEXVehicleLoanersList,
+  UEXVehicleLoanersObject,
+  UEXVehicleObject,
+  UEXVehiclePriceObject,
+  UEXVehiclePurchasePriceAllObject,
+  UEXVehicleRentalPriceAllObject,
+} from "../../../uex/vehicles";
+import {
+  UEXFuelPriceAllObject,
+  UEXFuelPricesAllResponseObject,
+} from "@uex/fuelPrices";
+import { UEXCategoryObject } from "@uex/categories";
+interface EnhancedPlanet extends UEXPlanet {
+  moons?: any[];
+  outposts?: any[];
+  pois?: any[];
+}
+
+const EnhancedPlanetObject = UEXPlanetObject.extend({
+  moons: z.array(z.any()).optional(),
+  outposts: z.array(z.any()).optional(),
+  pois: z.array(z.any()).optional(),
+});
+
+const LocationSystemDataObject = z.object({
+  system: UEXStarSystemObject,
+  planets: z.array(EnhancedPlanetObject),
+  orbits: z.array(z.any()),
+  spaceStations: z.array(z.any()),
+  outposts: z.array(z.any()),
+  poi: z.array(z.any()),
+  cities: z.array(z.any()),
+  orbitDistances: z.any().optional(),
+});
+
+type LocationSystemData = z.infer<typeof LocationSystemDataObject>;
 
 export async function getCoreReferenceData(): Promise<{
   gameVersions: UEXGameVersions;
   starSystems: UEXStarSystemsList;
   factions: UEXFactionsList;
-  jurisdictions: UEXJurisdictionsResponse;
-  companies: UEXCompaniesResponse;
-  commodityStatus: UEXCommodityStatusResponse;
-  refineryMethods: UEXRefineryMethodsResponse;
+  jurisdictions: UEXJurisdictionsList;
+  companies: UEXCompaniesList;
+  commodityStatus: UEXCommodityStatus;
+  refineryMethods: UEXRefineryMethodsList;
 }> {
   const [
     gameVersions,
@@ -55,26 +139,6 @@ export async function getCoreReferenceData(): Promise<{
 export async function getLocationHierarchyData(
   starSystems: UEXStarSystemsList
 ) {
-  // Define a proper type for our planet objects with the added properties
-  interface EnhancedPlanet extends UEXPlanet {
-    moons?: any[];
-    outposts?: any[];
-    pois?: any[];
-  }
-
-  // Define the type for our structure
-  interface LocationSystemData {
-    system: UEXStarSystem;
-    planets: EnhancedPlanet[];
-    orbits: any[];
-    spaceStations: any[];
-    outposts: any[];
-    poi: any[];
-    cities: any[];
-    orbitDistances?: any;
-  }
-
-  // Process each star system in parallel
   const systemPromises = starSystems.map(async (system) => {
     const locationData: LocationSystemData = {
       system,
@@ -279,13 +343,13 @@ export async function getVehicleData() {
   const vehiclePledgePrices = await uex.vehicles.listVehiclePrices();
 
   // Get vehicle loaners for concept ships
-  const vehicleLoaners: UEXVehicleLoanersList[] = [];
+  let vehicleLoaners: UEXVehicleLoanersList = [];
   for (const vehicle of vehicles.filter((v) => v.is_concept === 1)) {
     try {
       const loaners = await uex.vehicles.getVehicleLoaners({
         filter: { id_vehicle: vehicle.id },
       });
-      vehicleLoaners.push(loaners);
+      vehicleLoaners = [...vehicleLoaners, ...loaners];
     } catch (error) {
       console.warn(`Couldn't get loaners for vehicle ${vehicle.id}`);
     }
@@ -335,7 +399,7 @@ export async function getItemsData() {
   };
 }
 async function processBatchedAttributes(items: UEXItemsList, batchSize = 50) {
-  const allAttributes = [];
+  let allAttributes: UEXItemAttributesList = [];
 
   // Calculate how many batches we'll need
   const batchCount = Math.ceil(items.length / batchSize);
@@ -367,10 +431,12 @@ async function processBatchedAttributes(items: UEXItemsList, batchSize = 50) {
     });
 
     // Wait for current batch to complete
-    const batchResults = await Promise.all(batchPromises);
+    const batchResults: UEXItemAttributesList = (await Promise.all(
+      batchPromises
+    )) as UEXItemAttributesList;
 
     // Add this batch's results to our collection
-    allAttributes.push(...batchResults.flat());
+    allAttributes = [...allAttributes, ...batchResults];
 
     // Optional: Add a small delay between batches to be gentle on the API
     if (i < batchCount - 1) {
@@ -399,6 +465,7 @@ export async function getDataExtracts() {
       uex.data.DataExtractType.LAST_COMMODITY_DATA_REPORTS
     ),
   ]);
+  return { topRoutes, commodityPricesText, recentReports };
 }
 
 function delay(ms: number): Promise<void> {
@@ -409,7 +476,7 @@ function delay(ms: number): Promise<void> {
  * Extract all UEX data for embedding into Pinecone
  * @returns A structured object containing all UEX data
  */
-export async function extractUEXData() {
+export async function extractUEXData(): Promise<UEXPlatformDataExtraction> {
   console.log("Starting UEX data extraction process...");
 
   // Step 1: Get core reference data
@@ -492,4 +559,202 @@ export async function extractUEXData() {
 
   console.log("UEX data extraction complete!");
   return completeData;
+}
+
+export const UEXPlatformDataExtractionObject = z.object({
+  metadata: z.object({
+    extractionDate: z.string(),
+    gameVersion: z.string(),
+  }),
+  core: z.object({
+    gameVersions: UEXGameVersionsObject,
+    starSystems: z.array(UEXStarSystemObject),
+    factions: z.array(UEXFactionObject),
+    jurisdictions: z.array(UEXJurisdictionObject),
+    companies: z.array(UEXCompanyObject),
+    commodityStatus: UEXCommodityStatusObject,
+    refineryMethods: z.array(UEXRefineryMethodObject),
+  }),
+  locations: z.record(z.string(), LocationSystemDataObject),
+  terminals: z.object({
+    allTerminals: z.array(UEXTerminalObject),
+    terminalDistances: z.array(UEXTerminalDistanceObject),
+    majorTerminals: z.array(UEXTerminalObject),
+  }),
+  commodities: z.object({
+    commodities: z.array(UEXCommodityObject),
+    commodityAverages: z.array(UEXCommodityAverageObject),
+    commodityRanking: z.array(UEXCommodityRankingObject),
+    allCommodityPrices: z.array(UEXCommodityPriceAllObject),
+    allRawCommodityPrices: z.array(UEXCommodityRawPriceAllObject),
+    commodityPriceHistory: z.array(UEXCommodityPriceHistoryObject),
+  }),
+  fuel: z.array(UEXFuelPriceAllObject),
+  vehicles: z.object({
+    vehicles: z.array(UEXVehicleObject),
+    allVehiclePurchasePrices: z.array(UEXVehiclePurchasePriceAllObject),
+    allVehicleRentalPrices: z.array(UEXVehicleRentalPriceAllObject),
+    vehiclePledgePrices: z.array(UEXVehiclePriceObject),
+    vehicleLoaners: z.array(UEXVehicleLoanersObject),
+  }),
+  items: z.object({
+    categories: z.array(UEXCategoryObject),
+    items: z.array(UEXItemObject),
+    allItemPrices: z.array(UEXItemPriceAllObject),
+    itemAttributes: z.array(
+      z.union([UEXItemAttributeObject, z.array(UEXItemAttributeObject)])
+    ),
+  }),
+  refineries: z.object({
+    refineryCapacities: z.array(UEXRefineryCapacityObject),
+    refineryYields: z.array(UEXRefineryYieldObject),
+    refineryAudits: z.array(UEXRefineryAuditObject),
+  }),
+  extracts: z.object({
+    topRoutes: z.string(),
+    commodityPricesText: z.string(),
+    recentReports: z.string(),
+  }),
+});
+
+export type UEXPlatformDataExtraction = z.infer<
+  typeof UEXPlatformDataExtractionObject
+>;
+
+export async function processDataForEmbedding(
+  extractedData: UEXPlatformDataExtraction
+) {
+  console.log("Starting data enrichment for embeddings...");
+
+  // Create lookup maps for frequently referenced entities only
+  // This avoids excessive memory usage while still allowing fast lookups
+  console.log("Building reference maps...");
+  const maps = {
+    factions: new Map(extractedData.core.factions.map((f) => [f.id, f])),
+    jurisdictions: new Map(
+      extractedData.core.jurisdictions.map((j) => [j.id, j])
+    ),
+    starSystems: new Map(extractedData.core.starSystems.map((s) => [s.id, s])),
+    commodities: new Map(
+      extractedData.commodities.commodities.map((c) => [c.id, c])
+    ),
+  };
+
+  // Generate chunks by category to avoid holding the entire enriched dataset in memory
+  console.log("Generating star system chunks...");
+  const systemChunks = generateStarSystemChunks(extractedData, maps);
+
+  // console.log("Generating location chunks...");
+  // const locationChunks = generateLocationChunks(extractedData, maps);
+
+  // console.log("Generating terminal chunks...");
+  // const terminalChunks = generateTerminalChunks(extractedData, maps);
+
+  // console.log("Generating commodity chunks...");
+  // const commodityChunks = generateCommodityChunks(extractedData, maps);
+
+  // console.log("Generating vehicle chunks...");
+  // const vehicleChunks = generateVehicleChunks(extractedData, maps);
+
+  // Combine all chunks
+  const allChunks = [
+    ...systemChunks,
+    // ...locationChunks,
+    // ...terminalChunks,
+    // ...commodityChunks,
+    // ...vehicleChunks,
+    // Add more categories as needed
+  ];
+
+  console.log(`Generated ${allChunks.length} total chunks for embedding`);
+
+  // Save chunks to a file before embedding (in case of issues)
+
+  return allChunks;
+}
+
+interface UEXPlatformDataExtractionMaps {
+  factions: Map<number, UEXFaction>;
+  jurisdictions: Map<number, UEXJurisdiction>;
+  starSystems: Map<number, UEXStarSystem>;
+  commodities: Map<number, UEXCommodity>;
+}
+
+export function getExtractionMaps(
+  extractedData: UEXPlatformDataExtraction
+): UEXPlatformDataExtractionMaps {
+  const maps = {
+    factions: new Map(extractedData.core.factions.map((f) => [f.id, f])),
+    jurisdictions: new Map(
+      extractedData.core.jurisdictions.map((j) => [j.id, j])
+    ),
+    starSystems: new Map(extractedData.core.starSystems.map((s) => [s.id, s])),
+    commodities: new Map(
+      extractedData.commodities.commodities.map((c) => [c.id, c])
+    ),
+  };
+  return maps;
+}
+
+// Example of one chunk generation function
+export function generateStarSystemChunks(
+  extractedData: UEXPlatformDataExtraction,
+  maps: UEXPlatformDataExtractionMaps
+) {
+  const chunks = [];
+
+  for (const system of extractedData.core.starSystems) {
+    // Get related data
+    const faction = maps.factions.get(system.id_faction);
+    const jurisdiction = maps.jurisdictions.get(system.id_jurisdiction);
+    const planets = extractedData.locations[system.id]?.planets || [];
+    const terminals = extractedData.terminals.allTerminals.filter(
+      (t) => t.id_star_system === system.id
+    );
+
+    // Create detailed text that includes the relationships
+    const text = `Star System: ${system.name}
+Location: ${system.name} system in the Star Citizen universe
+Faction Control: ${faction?.name || "None"}
+Legal Jurisdiction: ${jurisdiction?.name || "None"}
+Status: ${
+      system.is_available_live
+        ? "Available in Star Citizen LIVE servers"
+        : "Not yet available in game"
+    }
+
+Description:
+The ${system.name} system contains ${planets.length} planets: ${planets
+      .map((p) => p.name)
+      .join(", ")}.
+${
+  terminals.length > 0
+    ? `It has ${terminals.length} trading terminals, including: ${terminals
+        .map((t) => t.name)
+        .slice(0, 5)
+        .join(", ")}${terminals.length > 5 ? "..." : ""}`
+    : "It has no known trading terminals."
+}
+${system.wiki ? `More information available at: ${system.wiki}` : ""}`;
+
+    chunks.push({
+      id: `system-${system.id}`,
+      text,
+      metadata: {
+        type: "star_system",
+        gameVersion: extractedData.metadata.gameVersion,
+        entityId: system.id,
+        name: system.name,
+        factionId: system.id_faction,
+        factionName: faction?.name,
+        jurisdictionId: system.id_jurisdiction,
+        jurisdictionName: jurisdiction?.name,
+        isAvailableLive: system.is_available_live === 1,
+        dateAdded: system.date_added,
+        dateModified: system.date_modified,
+      },
+    });
+  }
+
+  return chunks;
 }

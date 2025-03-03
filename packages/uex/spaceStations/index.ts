@@ -89,5 +89,5 @@ export async function listSpaceStations({
     validationObject: UEXSpaceStationsResponseObject,
   });
 
-  return result;
+  return result.data;
 }

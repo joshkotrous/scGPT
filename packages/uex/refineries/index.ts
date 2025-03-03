@@ -3,7 +3,7 @@ import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // 1. Define schema for refineries audits
-const UEXRefineryAuditObject = z.object({
+export const UEXRefineryAuditObject = z.object({
   id: z.number(),
   id_commodity: z.number().nullable().optional(),
   id_star_system: z.number(),
@@ -47,9 +47,10 @@ const UEXRefineryAuditsResponseObject = getValidationObject(
 export type UEXRefineryAuditsResponse = z.infer<
   typeof UEXRefineryAuditsResponseObject
 >;
+export type UEXRefineryAuditsList = z.infer<typeof UEXRefineryAuditObject>[];
 
 // 2. Define schema for refineries capacities
-const UEXRefineryCapacityObject = z.object({
+export const UEXRefineryCapacityObject = z.object({
   id: z.number(),
   id_commodity: z.number().nullable().optional(),
   id_star_system: z.number(),
@@ -85,9 +86,12 @@ const UEXRefineryCapacitiesResponseObject = getValidationObject(
 export type UEXRefineryCapacitiesResponse = z.infer<
   typeof UEXRefineryCapacitiesResponseObject
 >;
+export type UEXRefineryCapacitiesList = z.infer<
+  typeof UEXRefineryCapacityObject
+>[];
 
 // 3. Define schema for refineries methods
-const UEXRefineryMethodObject = z.object({
+export const UEXRefineryMethodObject = z.object({
   id: z.number(),
   name: z.string(),
   code: z.string(),
@@ -108,8 +112,10 @@ export type UEXRefineryMethodsResponse = z.infer<
   typeof UEXRefineryMethodsResponseObject
 >;
 
+export type UEXRefineryMethodsList = z.infer<typeof UEXRefineryMethodObject>[];
+
 // 4. Define schema for refineries yields
-const UEXRefineryYieldObject = z.object({
+export const UEXRefineryYieldObject = z.object({
   id: z.number(),
   id_commodity: z.number().nullable().optional(),
   id_star_system: z.number(),
@@ -146,13 +152,14 @@ const UEXRefineryYieldsResponseObject = getValidationObject(
 export type UEXRefineryYieldsResponse = z.infer<
   typeof UEXRefineryYieldsResponseObject
 >;
+export type UEXRefineryYieldsList = z.infer<typeof UEXRefineryYieldObject>[];
 
 /**
  * Get refinery audits information from the UEX API
  * Retrieves historical data about refinery operations
  * @returns Refinery audits data (maximum 500 rows)
  */
-export async function listRefineryAudits(): Promise<UEXRefineryAuditsResponse> {
+export async function listRefineryAudits(): Promise<UEXRefineryAuditsList> {
   const endpoint: UEXEndpoint = "refineries_audits";
 
   const result = await queryUEX({
@@ -160,7 +167,7 @@ export async function listRefineryAudits(): Promise<UEXRefineryAuditsResponse> {
     validationObject: UEXRefineryAuditsResponseObject,
   });
 
-  return result;
+  return result.data;
 }
 
 /**
@@ -168,7 +175,7 @@ export async function listRefineryAudits(): Promise<UEXRefineryAuditsResponse> {
  * Retrieves a list of the estimated capacity percentages for all refineries
  * @returns Refinery capacities data (maximum 500 rows)
  */
-export async function listRefineryCapacities(): Promise<UEXRefineryCapacitiesResponse> {
+export async function listRefineryCapacities(): Promise<UEXRefineryCapacitiesList> {
   const endpoint: UEXEndpoint = "refineries_capacities";
 
   const result = await queryUEX({
@@ -176,7 +183,7 @@ export async function listRefineryCapacities(): Promise<UEXRefineryCapacitiesRes
     validationObject: UEXRefineryCapacitiesResponseObject,
   });
 
-  return result;
+  return result.data;
 }
 
 /**
@@ -184,7 +191,7 @@ export async function listRefineryCapacities(): Promise<UEXRefineryCapacitiesRes
  * Retrieves a list of the refining methods used by all in-game refineries
  * @returns Refining methods data (maximum 500 rows)
  */
-export async function listRefineryMethods(): Promise<UEXRefineryMethodsResponse> {
+export async function listRefineryMethods(): Promise<UEXRefineryMethodsList> {
   const endpoint: UEXEndpoint = "refineries_methods";
 
   const result = await queryUEX({
@@ -192,7 +199,7 @@ export async function listRefineryMethods(): Promise<UEXRefineryMethodsResponse>
     validationObject: UEXRefineryMethodsResponseObject,
   });
 
-  return result;
+  return result.data;
 }
 
 /**
@@ -200,7 +207,7 @@ export async function listRefineryMethods(): Promise<UEXRefineryMethodsResponse>
  * Retrieves a list of all refineries yields bonuses per commodity
  * @returns Refinery yields data (maximum 500 rows)
  */
-export async function listRefineryYields(): Promise<UEXRefineryYieldsResponse> {
+export async function listRefineryYields(): Promise<UEXRefineryYieldsList> {
   const endpoint: UEXEndpoint = "refineries_yields";
 
   const result = await queryUEX({
@@ -208,5 +215,5 @@ export async function listRefineryYields(): Promise<UEXRefineryYieldsResponse> {
     validationObject: UEXRefineryYieldsResponseObject,
   });
 
-  return result;
+  return result.data;
 }

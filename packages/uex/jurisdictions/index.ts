@@ -3,7 +3,7 @@ import { queryUEX, getValidationObject } from "../core";
 import { UEXEndpoint } from "../core";
 
 // Define the schema for jurisdiction information based on the API documentation
-const UEXJurisdictionObject = z.object({
+export const UEXJurisdictionObject = z.object({
   id: z.number(),
   id_faction: z.number(), // comma separated
   name: z.string(),
@@ -27,13 +27,14 @@ const UEXJurisdictionsResponseObject = getValidationObject(
 export type UEXJurisdictionsResponse = z.infer<
   typeof UEXJurisdictionsResponseObject
 >;
+export type UEXJurisdictionsList = z.infer<typeof UEXJurisdictionObject>[];
 
 /**
  * Get all jurisdictions information from the UEX API
  * Retrieves a list of all jurisdictions in the Star Citizen universe
  * @returns Jurisdictions data
  */
-export async function listAllJurisdictions(): Promise<UEXJurisdictionsResponse> {
+export async function listAllJurisdictions(): Promise<UEXJurisdictionsList> {
   const endpoint: UEXEndpoint = "jurisdictions";
 
   const result = await queryUEX({
@@ -41,5 +42,5 @@ export async function listAllJurisdictions(): Promise<UEXJurisdictionsResponse> 
     validationObject: UEXJurisdictionsResponseObject,
   });
 
-  return result;
+  return result.data;
 }
